@@ -52,14 +52,7 @@ module Umgr
       state = state_backend.read
       return completed(:show, 'ok', options, state) if state
 
-      {
-        ok: true,
-        action: 'show',
-        status: 'not_initialized',
-        options: options,
-        state_path: state_backend.path,
-        state: nil
-      }
+      completed(:show, 'not_initialized', options, nil)
     end
 
     def import(**options)
