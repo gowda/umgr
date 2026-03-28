@@ -1,6 +1,6 @@
 # TODO
 
-- [ ] Phase 0: README Bootstrap
+- [x] Phase 0: README Bootstrap
   - [x] Task 0.1: Create brief README.md with motivation, interfaces, config/state model, and non-exhaustive provider examples
     - [x] CLI verification (Aruba)
     - [x] Library verification (RSpec)
