@@ -4,6 +4,7 @@ module Umgr
   class Runner
     ACTIONS = %i[init validate plan apply show import].freeze
     AUTO_DISCOVERY_CONFIGS = %w[umgr.yml umgr.yaml umgr.json].freeze
+    INITIAL_STATE = { version: 1, resources: [].freeze }.freeze
 
     def initialize(state_backend: nil)
       @state_backend = state_backend || StateBackend.new
@@ -25,7 +26,11 @@ module Umgr
     private
 
     def init(**options)
-      not_implemented(:init, options)
+      existing_state = state_backend.read
+      return completed(:init, 'already_initialized', options, existing_state) if existing_state
+
+      state_backend.write(INITIAL_STATE)
+      completed(:init, 'initialized', options, INITIAL_STATE)
     end
 
     def validate(**options)
@@ -59,6 +64,17 @@ module Umgr
         status: 'not_implemented',
         options: options,
         state_path: state_backend.path
+      }
+    end
+
+    def completed(action, status, options, state)
+      {
+        ok: true,
+        action: action.to_s,
+        status: status,
+        options: options,
+        state_path: state_backend.path,
+        state: state
       }
     end
 
@@ -97,29 +113,7 @@ module Umgr
     end
 
     def ensure_valid_config(config_path)
-      deep_symbolize_keys(ConfigValidator.validated_config(config_path))
-    end
-
-    def deep_symbolize_keys(value)
-      case value
-      when Hash
-        symbolize_hash(value)
-      when Array
-        symbolize_array(value)
-      else
-        value
-      end
-    end
-
-    def symbolize_hash(value)
-      value.each_with_object({}) do |(key, nested_value), memo|
-        symbol_key = key.is_a?(String) ? key.to_sym : key
-        memo[symbol_key] = deep_symbolize_keys(nested_value)
-      end
-    end
-
-    def symbolize_array(value)
-      value.map { |item| deep_symbolize_keys(item) }
+      DeepSymbolizer.call(ConfigValidator.validated_config(config_path))
     end
 
     attr_reader :state_backend

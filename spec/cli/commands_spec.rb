@@ -7,7 +7,6 @@ RSpec.describe 'umgr commands', :cli do
   let(:executable) { File.expand_path('../../exe/umgr', __dir__) }
 
   command_invocations = {
-    'init' => '',
     'validate' => '--config users.yml',
     'plan' => '--config users.yml',
     'apply' => '--config users.yml',
@@ -25,6 +24,30 @@ RSpec.describe 'umgr commands', :cli do
       expect(parsed['action']).to eq(command)
       expect(parsed['status']).to eq('not_implemented')
     end
+  end
+
+  it 'initializes state on init' do
+    run_command("#{executable} init")
+
+    expect(last_command_started).to have_exit_status(0)
+    parsed = JSON.parse(last_command_started.stdout)
+    expect(parsed['ok']).to eq(true)
+    expect(parsed['status']).to eq('initialized')
+    expect(parsed['state']).to eq('version' => 1, 'resources' => [])
+    state_path = parsed['state_path']
+    expect(state_path).to end_with('/.umgr/state.json')
+    expect(File.file?(state_path)).to eq(true)
+  end
+
+  it 'returns already_initialized when state file exists' do
+    write_file('.umgr/state.json', JSON.generate(version: 1, resources: []))
+    run_command("#{executable} init")
+
+    expect(last_command_started).to have_exit_status(0)
+    parsed = JSON.parse(last_command_started.stdout)
+    expect(parsed['ok']).to eq(true)
+    expect(parsed['status']).to eq('already_initialized')
+    expect(parsed['state']).to eq('version' => 1, 'resources' => [])
   end
 
   it 'passes config option to validate' do
@@ -121,7 +144,7 @@ RSpec.describe 'umgr commands', :cli do
   end
 
   it 'returns state backend path for commands' do
-    run_command("#{executable} init")
+    run_command("#{executable} show")
 
     expect(last_command_started).to have_exit_status(0)
     parsed = JSON.parse(last_command_started.stdout)

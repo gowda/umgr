@@ -14,13 +14,42 @@ RSpec.describe Umgr::Runner do
   end
 
   it 'dispatches all supported actions' do
-    %i[init show].each do |action|
+    %i[show].each do |action|
       result = runner.dispatch(action)
 
       expect(result[:action]).to eq(action.to_s)
       expect(result[:status]).to eq('not_implemented')
       expect(result[:ok]).to eq(false)
       expect(result[:state_path]).to end_with('/.umgr/state.json')
+    end
+  end
+
+  it 'initializes state on init' do
+    Dir.mktmpdir do |tmp_dir|
+      backend = Umgr::StateBackend.new(root_dir: tmp_dir)
+      local_runner = described_class.new(state_backend: backend)
+
+      result = local_runner.dispatch(:init)
+
+      expect(result[:ok]).to eq(true)
+      expect(result[:status]).to eq('initialized')
+      expect(result[:state]).to eq(version: 1, resources: [])
+      expect(File.file?(File.join(tmp_dir, '.umgr', 'state.json'))).to eq(true)
+      expect(backend.read).to eq(version: 1, resources: [])
+    end
+  end
+
+  it 'returns already_initialized when state exists' do
+    Dir.mktmpdir do |tmp_dir|
+      backend = Umgr::StateBackend.new(root_dir: tmp_dir)
+      backend.write(version: 1, resources: [{ provider: 'github', type: 'user', name: 'alice' }])
+      local_runner = described_class.new(state_backend: backend)
+
+      result = local_runner.dispatch(:init)
+
+      expect(result[:ok]).to eq(true)
+      expect(result[:status]).to eq('already_initialized')
+      expect(result[:state]).to eq(version: 1, resources: [{ provider: 'github', type: 'user', name: 'alice' }])
     end
   end
 
