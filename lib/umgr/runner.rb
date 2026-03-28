@@ -4,7 +4,7 @@ module Umgr
   class Runner
     ACTIONS = %i[init validate plan apply show import].freeze
     AUTO_DISCOVERY_CONFIGS = %w[umgr.yml umgr.yaml umgr.json].freeze
-    INITIAL_STATE = { version: 1, resources: [] }.freeze
+    INITIAL_STATE = { version: 1, resources: [].freeze }.freeze
 
     def initialize(state_backend: nil)
       @state_backend = state_backend || StateBackend.new
