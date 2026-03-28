@@ -29,6 +29,10 @@
     - [x] Ensure update policy is backward compatible for this gem's own major/minor release line
     - [x] Pre-commit checks passed (rubocop + rspec + aruba)
     - [x] Commit created
+  - [x] Task 1.5: Add explicit permissions block to checks workflow
+    - [x] Add top-level workflow permissions for least-privilege defaults
+    - [x] Run required checks including actionlint
+    - [x] Commit created
 
 - [ ] Phase 2: Config + Validation
   - [x] Task 2.1: Support YAML/JSON config auto-discovery and --config override
