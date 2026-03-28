@@ -1,0 +1,10 @@
+source 'https://rubygems.org'
+
+gemspec
+
+group :development, :test do
+  gem 'aruba'
+  gem 'rspec'
+  gem 'rubocop', require: false
+  gem 'rubocop-performance', require: false
+end
