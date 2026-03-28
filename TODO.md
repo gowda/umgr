@@ -25,11 +25,11 @@
     - [x] Commit created
 
 - [ ] Phase 2: Config + Validation
-  - [ ] Task 2.1: Support YAML/JSON config auto-discovery and --config override
-    - [ ] CLI verification (Aruba)
-    - [ ] Library verification (RSpec)
-    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [ ] Commit created
+  - [x] Task 2.1: Support YAML/JSON config auto-discovery and --config override
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
   - [ ] Task 2.2: Enforce core schema validation (provider/type/name and top-level shape)
     - [ ] CLI verification (Aruba)
     - [ ] Library verification (RSpec)

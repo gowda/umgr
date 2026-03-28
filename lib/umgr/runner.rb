@@ -3,6 +3,7 @@
 module Umgr
   class Runner
     ACTIONS = %i[init validate plan apply show import].freeze
+    AUTO_DISCOVERY_CONFIGS = %w[umgr.yml umgr.yaml umgr.json].freeze
 
     def ping
       :ok
@@ -57,9 +58,33 @@ module Umgr
     end
 
     def require_config!(action, options)
-      return if options[:config] && !options[:config].empty?
+      resolved = resolve_config_path(options[:config])
+      return options[:config] = resolved if resolved
 
-      raise Errors::ValidationError, "`config` is required for #{action}"
+      supported = AUTO_DISCOVERY_CONFIGS.join(', ')
+      raise Errors::ValidationError, "`config` is required for #{action}. Auto-discovery checks: #{supported}"
+    end
+
+    def resolve_config_path(config_path)
+      return explicit_config_path(config_path) if config_path && !config_path.empty?
+
+      discover_config_path
+    end
+
+    def explicit_config_path(config_path)
+      absolute_path = File.expand_path(config_path)
+      return absolute_path if File.file?(absolute_path)
+
+      raise Errors::ValidationError, "Config file not found: #{config_path}"
+    end
+
+    def discover_config_path
+      AUTO_DISCOVERY_CONFIGS.each do |candidate|
+        absolute_path = File.expand_path(candidate)
+        return absolute_path if File.file?(absolute_path)
+      end
+
+      nil
     end
   end
 end
