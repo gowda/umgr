@@ -21,5 +21,12 @@ module Umgr
     class InternalError < Error
       EXIT_CODE = 70
     end
+
+    class AbstractMethodError < Error
+    end
+
+    class ProviderContractError < Error
+      EXIT_CODE = ValidationError::EXIT_CODE
+    end
   end
 end
