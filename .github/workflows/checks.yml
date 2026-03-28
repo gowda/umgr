@@ -1,0 +1,57 @@
+name: checks
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  rubocop:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4.9'
+          bundler-cache: true
+
+      - name: Rubocop
+        run: bundle exec rubocop
+
+  library-checks:
+    runs-on: ubuntu-latest
+    needs: rubocop
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4.9'
+          bundler-cache: true
+
+      - name: RSpec library checks
+        run: bundle exec rspec --exclude-pattern "spec/cli/**/*_spec.rb"
+
+  cli-checks:
+    runs-on: ubuntu-latest
+    needs: library-checks
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4.9'
+          bundler-cache: true
+
+      - name: RSpec CLI checks
+        run: bundle exec rspec spec/cli
