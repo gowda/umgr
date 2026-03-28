@@ -77,21 +77,23 @@ RSpec.describe Umgr::Runner do
   end
 
   it 'raises validation error when top-level required keys are missing' do
-    File.write('invalid.yml', "resources: []\n")
+    Dir.mktmpdir do |tmp_dir|
+      File.write(File.join(tmp_dir, 'invalid.yml'), "resources: []\n")
 
-    expect { runner.dispatch(:validate, config: 'invalid.yml') }
-      .to raise_error(Umgr::Errors::ValidationError, /Missing required key `version`/)
-  ensure
-    FileUtils.rm_f('invalid.yml')
+      expect do
+        Dir.chdir(tmp_dir) { runner.dispatch(:validate, config: 'invalid.yml') }
+      end.to raise_error(Umgr::Errors::ValidationError, /Missing required key `version`/)
+    end
   end
 
   it 'raises validation error when resource required fields are missing' do
-    File.write('invalid.yml', "version: 1\nresources:\n  - provider: github\n")
+    Dir.mktmpdir do |tmp_dir|
+      File.write(File.join(tmp_dir, 'invalid.yml'), "version: 1\nresources:\n  - provider: github\n")
 
-    expect { runner.dispatch(:validate, config: 'invalid.yml') }
-      .to raise_error(Umgr::Errors::ValidationError, /missing required string field `type`/)
-  ensure
-    FileUtils.rm_f('invalid.yml')
+      expect do
+        Dir.chdir(tmp_dir) { runner.dispatch(:validate, config: 'invalid.yml') }
+      end.to raise_error(Umgr::Errors::ValidationError, /missing required string field `type`/)
+    end
   end
 
   it 'keeps action methods private' do
