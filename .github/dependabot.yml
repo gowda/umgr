@@ -8,10 +8,6 @@ updates:
       bundler-dependencies:
         patterns:
           - "*"
-    ignore:
-      - dependency-name: "*"
-        update-types:
-          - "version-update:semver-major"
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
@@ -20,7 +16,3 @@ updates:
       github-actions-dependencies:
         patterns:
           - "*"
-    ignore:
-      - dependency-name: "*"
-        update-types:
-          - "version-update:semver-major"
