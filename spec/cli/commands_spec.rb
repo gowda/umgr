@@ -38,7 +38,8 @@ RSpec.describe 'umgr commands', :cli do
     run_command("#{executable} validate")
 
     expect(last_command_started).to have_exit_status(Umgr::Errors::ValidationError::EXIT_CODE)
-    parsed = JSON.parse(last_command_started.stdout)
+    error_line = last_command_started.stderr.lines.map(&:strip).reverse.find { |line| line.start_with?('{') }
+    parsed = JSON.parse(error_line)
     expect(parsed['ok']).to eq(false)
     expect(parsed['error']['type']).to eq('Umgr::Errors::ValidationError')
   end

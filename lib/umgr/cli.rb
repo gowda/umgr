@@ -77,7 +77,7 @@ module Umgr
     # rubocop:enable Style/ArgumentsForwarding
 
     def render_error(error)
-      puts JSON.generate(
+      warn JSON.generate(
         {
           ok: false,
           error: {
