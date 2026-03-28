@@ -75,4 +75,15 @@ RSpec.describe 'umgr commands', :cli do
     expect(parsed['error']['type']).to eq('Umgr::Errors::ValidationError')
     expect(parsed['error']['message']).to match(/missing required string field `type`/)
   end
+
+  it 'returns validation error when version is invalid' do
+    write_file('invalid.yml', "version: banana\nresources: []\n")
+    run_command("#{executable} validate --config invalid.yml")
+
+    expect(last_command_started).to have_exit_status(Umgr::Errors::ValidationError::EXIT_CODE)
+    error_line = last_command_started.stderr.lines.map(&:strip).reject(&:empty?).last
+    parsed = JSON.parse(error_line)
+    expect(parsed['error']['type']).to eq('Umgr::Errors::ValidationError')
+    expect(parsed['error']['message']).to match(/`version` must be a positive integer/)
+  end
 end

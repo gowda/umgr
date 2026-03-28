@@ -52,6 +52,11 @@ module Umgr
 
         raise Errors::ValidationError, "Missing required key `#{key}` in #{config_path}"
       end
+
+      version = parsed['version']
+      return if version.is_a?(Integer) && version.positive?
+
+      raise Errors::ValidationError, "`version` must be a positive integer in #{config_path}"
     end
 
     def validate_resources!(resources)
