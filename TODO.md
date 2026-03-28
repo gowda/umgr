@@ -13,11 +13,11 @@
     - [x] Library verification (RSpec)
     - [x] Pre-commit checks passed (rubocop + rspec + aruba)
     - [x] Commit created
-  - [ ] Task 1.2: Implement shared CLI->Runner command dispatch for init, validate, plan, apply, show, and import
-    - [ ] CLI verification (Aruba)
-    - [ ] Library verification (RSpec)
-    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [ ] Commit created
+  - [x] Task 1.2: Implement shared CLI->Runner command dispatch for init, validate, plan, apply, show, and import
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
   - [ ] Task 1.3: Implement unified errors and CLI exit-code mapping
     - [ ] CLI verification (Aruba)
     - [ ] Library verification (RSpec)
