@@ -1,0 +1,139 @@
+# TODO
+
+- [ ] Phase 0: README Bootstrap
+  - [ ] Task 0.1: Create brief README.md with motivation, interfaces, config/state model, and non-exhaustive provider examples
+    - [ ] CLI verification (Aruba)
+    - [ ] Library verification (RSpec)
+    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [ ] Commit created
+
+- [ ] Phase 1: Foundation + Shared Runtime
+  - [ ] Task 1.1: Scaffold gem, executable, Thor CLI wiring, RSpec/Aruba setup, RuboCop + rubocop-performance config
+    - [ ] CLI verification (Aruba)
+    - [ ] Library verification (RSpec)
+    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [ ] Commit created
+  - [ ] Task 1.2: Implement shared CLI->Runner command dispatch for init, validate, plan, apply, and show
+    - [ ] CLI verification (Aruba)
+    - [ ] Library verification (RSpec)
+    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [ ] Commit created
+  - [ ] Task 1.3: Implement unified errors and CLI exit-code mapping
+    - [ ] CLI verification (Aruba)
+    - [ ] Library verification (RSpec)
+    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [ ] Commit created
+
+- [ ] Phase 2: Config + Validation
+  - [ ] Task 2.1: Support YAML/JSON config auto-discovery and --config override
+    - [ ] CLI verification (Aruba)
+    - [ ] Library verification (RSpec)
+    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [ ] Commit created
+  - [ ] Task 2.2: Enforce core schema validation (provider/type/name and top-level shape)
+    - [ ] CLI verification (Aruba)
+    - [ ] Library verification (RSpec)
+    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [ ] Commit created
+  - [ ] Task 2.3: Preserve hybrid payload fields (attributes + provider-specific options)
+    - [ ] CLI verification (Aruba)
+    - [ ] Library verification (RSpec)
+    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [ ] Commit created
+
+- [ ] Phase 3: State Backend + Visibility
+  - [ ] Task 3.1: Implement local state backend (.umgr/state.json) with atomic writes
+    - [ ] CLI verification (Aruba)
+    - [ ] Library verification (RSpec)
+    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [ ] Commit created
+  - [ ] Task 3.2: Implement init command/API for state initialization
+    - [ ] CLI verification (Aruba)
+    - [ ] Library verification (RSpec)
+    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [ ] Commit created
+  - [ ] Task 3.3: Implement show command/API for state inspection
+    - [ ] CLI verification (Aruba)
+    - [ ] Library verification (RSpec)
+    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [ ] Commit created
+
+- [ ] Phase 4: Provider Framework + Echo Provider
+  - [ ] Task 4.1: Define provider interface contract (validate/current/plan/apply) and registry
+    - [ ] CLI verification (Aruba)
+    - [ ] Library verification (RSpec)
+    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [ ] Commit created
+  - [ ] Task 4.2: Implement unknown-provider handling in validation/runtime flows
+    - [ ] CLI verification (Aruba)
+    - [ ] Library verification (RSpec)
+    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [ ] Commit created
+  - [ ] Task 4.3: Implement built-in echo test provider that echoes fake user account attributes
+    - [ ] CLI verification (Aruba)
+    - [ ] Library verification (RSpec)
+    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [ ] Commit created
+
+- [ ] Phase 5: Provider Authoring Documentation
+  - [ ] Task 5.1: Add detailed provider/plugin authoring guide in separate markdown file after first provider implementation
+    - [ ] CLI verification (Aruba)
+    - [ ] Library verification (RSpec)
+    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [ ] Commit created
+  - [ ] Task 5.2: Update README.md to point to provider authoring guide
+    - [ ] CLI verification (Aruba)
+    - [ ] Library verification (RSpec)
+    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [ ] Commit created
+
+- [ ] Phase 6: Planning Engine
+  - [ ] Task 6.1: Implement canonical resource identity (provider.type.name)
+    - [ ] CLI verification (Aruba)
+    - [ ] Library verification (RSpec)
+    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [ ] Commit created
+  - [ ] Task 6.2: Implement desired-vs-current diff and change-set generation
+    - [ ] CLI verification (Aruba)
+    - [ ] Library verification (RSpec)
+    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [ ] Commit created
+  - [ ] Task 6.3: Implement plan outputs (human default + --json)
+    - [ ] CLI verification (Aruba)
+    - [ ] Library verification (RSpec)
+    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [ ] Commit created
+
+- [ ] Phase 7: Apply Engine
+  - [ ] Task 7.1: Implement apply execution and state persistence
+    - [ ] CLI verification (Aruba)
+    - [ ] Library verification (RSpec)
+    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [ ] Commit created
+  - [ ] Task 7.2: Implement idempotency checks (apply then plan yields no changes)
+    - [ ] CLI verification (Aruba)
+    - [ ] Library verification (RSpec)
+    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [ ] Commit created
+  - [ ] Task 7.3: Implement failure safety to prevent state corruption on apply errors
+    - [ ] CLI verification (Aruba)
+    - [ ] Library verification (RSpec)
+    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [ ] Commit created
+
+- [ ] Phase 8: Hardening + Docs Consistency
+  - [ ] Task 8.1: Add end-to-end workflow coverage (init -> validate -> plan -> apply -> show)
+    - [ ] CLI verification (Aruba)
+    - [ ] Library verification (RSpec)
+    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [ ] Commit created
+  - [ ] Task 8.2: Run README/provider-doc consistency pass and fix mismatches
+    - [ ] CLI verification (Aruba)
+    - [ ] Library verification (RSpec)
+    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [ ] Commit created
+  - [ ] Task 8.3: Final stabilization with all checks green
+    - [ ] CLI verification (Aruba)
+    - [ ] Library verification (RSpec)
+    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [ ] Commit created
