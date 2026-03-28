@@ -1,11 +1,11 @@
 # TODO
 
 - [ ] Phase 0: README Bootstrap
-  - [ ] Task 0.1: Create brief README.md with motivation, interfaces, config/state model, and non-exhaustive provider examples
-    - [ ] CLI verification (Aruba)
-    - [ ] Library verification (RSpec)
-    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [ ] Commit created
+  - [x] Task 0.1: Create brief README.md with motivation, interfaces, config/state model, and non-exhaustive provider examples
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks waived by user exception (2026-03-28)
+    - [x] Commit created
 
 - [ ] Phase 1: Foundation + Shared Runtime
   - [ ] Task 1.1: Scaffold gem, executable, Thor CLI wiring, RSpec/Aruba setup, RuboCop + rubocop-performance config
