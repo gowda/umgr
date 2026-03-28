@@ -66,6 +66,24 @@ RSpec.describe Umgr::Runner do
       .to raise_error(Umgr::Errors::ValidationError, /Config file not found/)
   end
 
+  it 'raises validation error when top-level required keys are missing' do
+    File.write('invalid.yml', "resources: []\n")
+
+    expect { runner.dispatch(:validate, config: 'invalid.yml') }
+      .to raise_error(Umgr::Errors::ValidationError, /Missing required key `version`/)
+  ensure
+    FileUtils.rm_f('invalid.yml')
+  end
+
+  it 'raises validation error when resource required fields are missing' do
+    File.write('invalid.yml', "version: 1\nresources:\n  - provider: github\n")
+
+    expect { runner.dispatch(:validate, config: 'invalid.yml') }
+      .to raise_error(Umgr::Errors::ValidationError, /missing required string field `type`/)
+  ensure
+    FileUtils.rm_f('invalid.yml')
+  end
+
   it 'keeps action methods private' do
     described_class::ACTIONS.each do |action|
       expect(runner).not_to respond_to(action)

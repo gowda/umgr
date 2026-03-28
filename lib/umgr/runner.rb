@@ -60,7 +60,10 @@ module Umgr
     def with_resolved_config(action, options)
       resolved_options = options.dup
       resolved = resolve_config_path(options[:config])
-      return resolved_options.merge(config: resolved) if resolved
+      if resolved
+        ensure_valid_config(resolved)
+        return resolved_options.merge(config: resolved)
+      end
 
       supported = AUTO_DISCOVERY_CONFIGS.join(', ')
       raise Errors::ValidationError, "`config` is required for #{action}. Auto-discovery checks: #{supported}"
@@ -86,6 +89,10 @@ module Umgr
       end
 
       nil
+    end
+
+    def ensure_valid_config(config_path)
+      ConfigValidator.validate!(config_path)
     end
   end
 end
