@@ -24,5 +24,9 @@ module Umgr
 
     class AbstractMethodError < Error
     end
+
+    class ProviderContractError < Error
+      EXIT_CODE = ValidationError::EXIT_CODE
+    end
   end
 end

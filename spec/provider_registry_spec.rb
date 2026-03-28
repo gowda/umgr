@@ -27,11 +27,11 @@ RSpec.describe Umgr::ProviderRegistry do
 
   it 'raises for empty provider names' do
     expect { registry.register(' ', provider) }
-      .to raise_error(ArgumentError, /Provider name must be a non-empty/)
+      .to raise_error(Umgr::Errors::ProviderContractError, /Provider name must be a non-empty/)
   end
 
   it 'raises when provider contract is incomplete' do
     expect { registry.register('github', Object.new) }
-      .to raise_error(ArgumentError, /must implement/)
+      .to raise_error(Umgr::Errors::ProviderContractError, /must implement/)
   end
 end

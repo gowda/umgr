@@ -12,7 +12,8 @@ module Umgr
       end
       return provider if invalid_methods.empty?
 
-      raise ArgumentError, "Provider #{provider.class} must implement concrete methods: #{invalid_methods.join(', ')}"
+      raise Errors::ProviderContractError,
+            "Provider #{provider.class} must implement concrete methods: #{invalid_methods.join(', ')}"
     end
   end
 end

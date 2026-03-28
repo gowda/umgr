@@ -26,7 +26,7 @@ module Umgr
 
     def normalize_name(name)
       normalized = name.to_s.strip
-      raise ArgumentError, 'Provider name must be a non-empty string or symbol' if normalized.empty?
+      raise Errors::ProviderContractError, 'Provider name must be a non-empty string or symbol' if normalized.empty?
 
       normalized.to_sym
     end
