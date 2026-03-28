@@ -7,10 +7,12 @@ module Umgr
     module_function
 
     def validate!(provider)
-      missing_methods = METHODS.reject { |method_name| provider.respond_to?(method_name) }
-      return provider if missing_methods.empty?
+      invalid_methods = METHODS.reject do |method_name|
+        provider.respond_to?(method_name) && provider.method(method_name).owner != Provider
+      end
+      return provider if invalid_methods.empty?
 
-      raise ArgumentError, "Provider #{provider.class} must implement: #{missing_methods.join(', ')}"
+      raise ArgumentError, "Provider #{provider.class} must implement concrete methods: #{invalid_methods.join(', ')}"
     end
   end
 end
