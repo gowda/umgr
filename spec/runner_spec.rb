@@ -27,6 +27,12 @@ RSpec.describe Umgr::Runner do
     expect(result[:options]).to eq({ config: 'users.yml' })
   end
 
+  it 'keeps action methods private' do
+    described_class::ACTIONS.each do |action|
+      expect(runner).not_to respond_to(action)
+    end
+  end
+
   it 'raises for unsupported actions' do
     expect { runner.dispatch(:unknown) }.to raise_error(ArgumentError, /Unknown action/)
   end

@@ -8,45 +8,40 @@ module Umgr
       :ok
     end
 
+    # rubocop:disable Style/ArgumentsForwarding
     def dispatch(action, **options)
       action_name = action.to_sym
       raise ArgumentError, "Unknown action: #{action}" unless ACTIONS.include?(action_name)
 
-      payload = options.dup
-      public_send(action_name, **payload)
+      send(action_name, **options)
     end
+    # rubocop:enable Style/ArgumentsForwarding
+
+    private
 
     def init(**options)
-      payload = options.dup
-      not_implemented(:init, payload)
+      not_implemented(:init, options)
     end
 
     def validate(**options)
-      payload = options.dup
-      not_implemented(:validate, payload)
+      not_implemented(:validate, options)
     end
 
     def plan(**options)
-      payload = options.dup
-      not_implemented(:plan, payload)
+      not_implemented(:plan, options)
     end
 
     def apply(**options)
-      payload = options.dup
-      not_implemented(:apply, payload)
+      not_implemented(:apply, options)
     end
 
     def show(**options)
-      payload = options.dup
-      not_implemented(:show, payload)
+      not_implemented(:show, options)
     end
 
     def import(**options)
-      payload = options.dup
-      not_implemented(:import, payload)
+      not_implemented(:import, options)
     end
-
-    private
 
     def not_implemented(action, options)
       {
