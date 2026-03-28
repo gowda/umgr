@@ -13,14 +13,46 @@ RSpec.describe Umgr::Runner do
     expect(runner.ping).to eq(:ok)
   end
 
-  it 'dispatches all supported actions' do
-    %i[show].each do |action|
-      result = runner.dispatch(action)
+  it 'dispatches not_implemented for remaining placeholder actions' do
+    Dir.mktmpdir do |tmp_dir|
+      File.write(File.join(tmp_dir, 'users.yml'), "version: 1\nresources: []\n")
 
-      expect(result[:action]).to eq(action.to_s)
-      expect(result[:status]).to eq('not_implemented')
-      expect(result[:ok]).to eq(false)
-      expect(result[:state_path]).to end_with('/.umgr/state.json')
+      %i[validate plan apply import].each do |action|
+        result = Dir.chdir(tmp_dir) { runner.dispatch(action, config: 'users.yml') }
+
+        expect(result[:action]).to eq(action.to_s)
+        expect(result[:status]).to eq('not_implemented')
+        expect(result[:ok]).to eq(false)
+        expect(result[:state_path]).to end_with('/.umgr/state.json')
+      end
+    end
+  end
+
+  it 'returns not_initialized when show is called without state' do
+    Dir.mktmpdir do |tmp_dir|
+      backend = Umgr::StateBackend.new(root_dir: tmp_dir)
+      local_runner = described_class.new(state_backend: backend)
+
+      result = local_runner.dispatch(:show)
+
+      expect(result[:ok]).to eq(true)
+      expect(result[:status]).to eq('not_initialized')
+      expect(result[:state]).to eq(nil)
+      expect(result[:state_path]).to eq(File.join(tmp_dir, '.umgr', 'state.json'))
+    end
+  end
+
+  it 'returns current state when show is called with initialized state' do
+    Dir.mktmpdir do |tmp_dir|
+      backend = Umgr::StateBackend.new(root_dir: tmp_dir)
+      backend.write(version: 1, resources: [{ provider: 'github', type: 'user', name: 'alice' }])
+      local_runner = described_class.new(state_backend: backend)
+
+      result = local_runner.dispatch(:show)
+
+      expect(result[:ok]).to eq(true)
+      expect(result[:status]).to eq('ok')
+      expect(result[:state]).to eq(version: 1, resources: [{ provider: 'github', type: 'user', name: 'alice' }])
     end
   end
 

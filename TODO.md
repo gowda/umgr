@@ -51,7 +51,7 @@
     - [x] Pre-commit checks passed (rubocop + rspec + aruba)
     - [x] Commit created
 
-- [ ] Phase 3: State Backend + Visibility
+- [x] Phase 3: State Backend + Visibility
   - [x] Task 3.1: Implement local state backend (.umgr/state.json) with atomic writes
     - [x] CLI verification (Aruba)
     - [x] Library verification (RSpec)
@@ -62,11 +62,11 @@
     - [x] Library verification (RSpec)
     - [x] Pre-commit checks passed (rubocop + rspec + aruba)
     - [x] Commit created
-  - [ ] Task 3.3: Implement show command/API for state inspection
-    - [ ] CLI verification (Aruba)
-    - [ ] Library verification (RSpec)
-    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [ ] Commit created
+  - [x] Task 3.3: Implement show command/API for state inspection
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
 
 - [ ] Phase 4: Provider Framework + Echo Provider
   - [ ] Task 4.1: Define provider interface contract (validate/current/plan/apply) and registry
