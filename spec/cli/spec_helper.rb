@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'aruba/rspec'
+require 'umgr'
 
 RSpec.configure do |config|
   config.include Aruba::Api

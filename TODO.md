@@ -18,11 +18,11 @@
     - [x] Library verification (RSpec)
     - [x] Pre-commit checks passed (rubocop + rspec + aruba)
     - [x] Commit created
-  - [ ] Task 1.3: Implement unified errors and CLI exit-code mapping
-    - [ ] CLI verification (Aruba)
-    - [ ] Library verification (RSpec)
-    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [ ] Commit created
+  - [x] Task 1.3: Implement unified errors and CLI exit-code mapping
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
 
 - [ ] Phase 2: Config + Validation
   - [ ] Task 2.1: Support YAML/JSON config auto-discovery and --config override

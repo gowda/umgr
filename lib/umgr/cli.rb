@@ -17,36 +17,36 @@ module Umgr
 
     desc 'init', 'Initialize umgr state'
     def init
-      render_result(runner.dispatch(:init))
+      execute(:init)
     end
 
     desc 'validate', 'Validate configuration'
     option :config, type: :string, desc: 'Path to config file'
     def validate
-      render_result(runner.dispatch(:validate, **command_options))
+      execute(:validate, **command_options)
     end
 
     desc 'plan', 'Generate plan from desired state'
     option :config, type: :string, desc: 'Path to config file'
     def plan
-      render_result(runner.dispatch(:plan, **command_options))
+      execute(:plan, **command_options)
     end
 
     desc 'apply', 'Apply desired state'
     option :config, type: :string, desc: 'Path to config file'
     def apply
-      render_result(runner.dispatch(:apply, **command_options))
+      execute(:apply, **command_options)
     end
 
     desc 'show', 'Show current state'
     def show
-      render_result(runner.dispatch(:show))
+      execute(:show)
     end
 
     desc 'import', 'Import current users from providers'
     option :config, type: :string, desc: 'Path to config file'
     def import
-      render_result(runner.dispatch(:import, **command_options))
+      execute(:import, **command_options)
     end
 
     private
@@ -61,6 +61,31 @@ module Umgr
 
     def render_result(result)
       puts JSON.generate(result)
+    end
+
+    # rubocop:disable Style/ArgumentsForwarding
+    def execute(action, **options)
+      render_result(runner.dispatch(action, **options))
+    rescue Errors::Error => e
+      render_error(e)
+      exit(e.exit_code)
+    rescue StandardError => e
+      internal = Errors::InternalError.new(e.message)
+      render_error(internal)
+      exit(internal.exit_code)
+    end
+    # rubocop:enable Style/ArgumentsForwarding
+
+    def render_error(error)
+      puts JSON.generate(
+        {
+          ok: false,
+          error: {
+            type: error.class.name,
+            message: error.message
+          }
+        }
+      )
     end
   end
 end
