@@ -5,6 +5,10 @@ module Umgr
     ACTIONS = %i[init validate plan apply show import].freeze
     AUTO_DISCOVERY_CONFIGS = %w[umgr.yml umgr.yaml umgr.json].freeze
 
+    def initialize(state_backend: nil)
+      @state_backend = state_backend || StateBackend.new
+    end
+
     def ping
       :ok
     end
@@ -53,7 +57,8 @@ module Umgr
         ok: false,
         action: action.to_s,
         status: 'not_implemented',
-        options: options
+        options: options,
+        state_path: state_backend.path
       }
     end
 
@@ -116,5 +121,7 @@ module Umgr
     def symbolize_array(value)
       value.map { |item| deep_symbolize_keys(item) }
     end
+
+    attr_reader :state_backend
   end
 end
