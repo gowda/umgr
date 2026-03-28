@@ -74,11 +74,11 @@
     - [x] Library verification (RSpec)
     - [x] Pre-commit checks passed (rubocop + rspec + aruba)
     - [x] Commit created
-  - [ ] Task 4.2: Implement unknown-provider handling in validation/runtime flows
-    - [ ] CLI verification (Aruba)
-    - [ ] Library verification (RSpec)
-    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [ ] Commit created
+  - [x] Task 4.2: Implement unknown-provider handling in validation/runtime flows
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
   - [ ] Task 4.3: Implement built-in echo test provider that echoes fake user account attributes
     - [ ] CLI verification (Aruba)
     - [ ] Library verification (RSpec)
