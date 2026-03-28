@@ -2,6 +2,7 @@
 
 require_relative 'umgr/version'
 require_relative 'umgr/errors'
+require_relative 'umgr/config_validator'
 require_relative 'umgr/runner'
 require_relative 'umgr/cli'
 

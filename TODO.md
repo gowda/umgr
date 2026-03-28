@@ -40,11 +40,11 @@
     - [x] Library verification (RSpec)
     - [x] Pre-commit checks passed (rubocop + rspec + aruba)
     - [x] Commit created
-  - [ ] Task 2.2: Enforce core schema validation (provider/type/name and top-level shape)
-    - [ ] CLI verification (Aruba)
-    - [ ] Library verification (RSpec)
-    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [ ] Commit created
+  - [x] Task 2.2: Enforce core schema validation (provider/type/name and top-level shape)
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
   - [ ] Task 2.3: Preserve hybrid payload fields (attributes + provider-specific options)
     - [ ] CLI verification (Aruba)
     - [ ] Library verification (RSpec)

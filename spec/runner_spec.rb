@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'tmpdir'
-require 'fileutils'
 
 RSpec.describe Umgr::Runner do
   subject(:runner) { described_class.new }
@@ -25,12 +24,13 @@ RSpec.describe Umgr::Runner do
   end
 
   it 'passes options to dispatched methods' do
-    File.write('users.yml', "version: 1\nresources: []\n")
-    result = runner.dispatch(:validate, config: 'users.yml')
+    Dir.mktmpdir do |tmp_dir|
+      File.write(File.join(tmp_dir, 'users.yml'), "version: 1\nresources: []\n")
 
-    expect(result[:options][:config]).to end_with('users.yml')
-  ensure
-    FileUtils.rm_f('users.yml')
+      result = Dir.chdir(tmp_dir) { runner.dispatch(:validate, config: 'users.yml') }
+
+      expect(result[:options][:config]).to end_with('/users.yml')
+    end
   end
 
   it 'auto-discovers config when not explicitly provided' do
@@ -64,6 +64,36 @@ RSpec.describe Umgr::Runner do
   it 'raises validation error when explicit config is missing' do
     expect { runner.dispatch(:validate, config: 'does-not-exist.yml') }
       .to raise_error(Umgr::Errors::ValidationError, /Config file not found/)
+  end
+
+  it 'raises validation error when version type is invalid' do
+    Dir.mktmpdir do |tmp_dir|
+      File.write(File.join(tmp_dir, 'invalid.yml'), "version: banana\nresources: []\n")
+
+      expect do
+        Dir.chdir(tmp_dir) { runner.dispatch(:validate, config: 'invalid.yml') }
+      end.to raise_error(Umgr::Errors::ValidationError, /`version` must be a positive integer/)
+    end
+  end
+
+  it 'raises validation error when top-level required keys are missing' do
+    Dir.mktmpdir do |tmp_dir|
+      File.write(File.join(tmp_dir, 'invalid.yml'), "resources: []\n")
+
+      expect do
+        Dir.chdir(tmp_dir) { runner.dispatch(:validate, config: 'invalid.yml') }
+      end.to raise_error(Umgr::Errors::ValidationError, /Missing required key `version`/)
+    end
+  end
+
+  it 'raises validation error when resource required fields are missing' do
+    Dir.mktmpdir do |tmp_dir|
+      File.write(File.join(tmp_dir, 'invalid.yml'), "version: 1\nresources:\n  - provider: github\n")
+
+      expect do
+        Dir.chdir(tmp_dir) { runner.dispatch(:validate, config: 'invalid.yml') }
+      end.to raise_error(Umgr::Errors::ValidationError, /missing required string field `type`/)
+    end
   end
 
   it 'keeps action methods private' do
