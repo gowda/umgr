@@ -23,6 +23,12 @@
     - [x] Library verification (RSpec)
     - [x] Pre-commit checks passed (rubocop + rspec + aruba)
     - [x] Commit created
+  - [x] Task 1.4: Add Dependabot config for bundler and github-actions with ecosystem-specific grouping
+    - [x] Configure `.github/dependabot.yml` for `bundler` and `github-actions` ecosystems
+    - [x] Define grouping rules for each ecosystem
+    - [x] Ensure update policy is backward compatible for this gem's own major/minor release line
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
 
 - [ ] Phase 2: Config + Validation
   - [ ] Task 2.1: Support YAML/JSON config auto-discovery and --config override
