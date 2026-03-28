@@ -6,7 +6,7 @@ RSpec.describe 'umgr help', :cli do
   it 'shows available commands' do
     executable = File.expand_path('../../exe/umgr', __dir__)
 
-    run_command("bundle exec ruby #{executable} help")
+    run_command("#{executable} help")
 
     expect(last_command_started).to have_output(/Commands:/)
     expect(last_command_started).to have_exit_status(0)
