@@ -10,7 +10,6 @@ RSpec.describe 'umgr commands', :cli do
     'validate' => '--config users.yml',
     'plan' => '--config users.yml',
     'apply' => '--config users.yml',
-    'show' => '',
     'import' => '--config users.yml'
   }
 
@@ -24,6 +23,33 @@ RSpec.describe 'umgr commands', :cli do
       expect(parsed['action']).to eq(command)
       expect(parsed['status']).to eq('not_implemented')
     end
+  end
+
+  it 'returns not_initialized for show when state is missing' do
+    run_command("#{executable} show")
+
+    expect(last_command_started).to have_exit_status(0)
+    parsed = JSON.parse(last_command_started.stdout)
+    expect(parsed['ok']).to eq(true)
+    expect(parsed['status']).to eq('not_initialized')
+    expect(parsed['state']).to eq(nil)
+  end
+
+  it 'returns current state for show when state exists' do
+    write_file(
+      '.umgr/state.json',
+      JSON.generate(version: 1, resources: [{ provider: 'github', type: 'user', name: 'alice' }])
+    )
+    run_command("#{executable} show")
+
+    expect(last_command_started).to have_exit_status(0)
+    parsed = JSON.parse(last_command_started.stdout)
+    expect(parsed['ok']).to eq(true)
+    expect(parsed['status']).to eq('ok')
+    expect(parsed['state']).to eq(
+      'version' => 1,
+      'resources' => [{ 'provider' => 'github', 'type' => 'user', 'name' => 'alice' }]
+    )
   end
 
   it 'initializes state on init' do

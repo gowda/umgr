@@ -49,7 +49,10 @@ module Umgr
     end
 
     def show(**options)
-      not_implemented(:show, options)
+      state = state_backend.read
+      return completed(:show, 'ok', options, state) if state
+
+      completed(:show, 'not_initialized', options, nil)
     end
 
     def import(**options)
