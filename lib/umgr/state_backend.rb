@@ -32,7 +32,7 @@ module Umgr
       File.rename(temp_path, path)
       path
     ensure
-      File.delete(temp_path) if temp_path && File.exist?(temp_path)
+      FileUtils.rm_f(temp_path)
     end
 
     private
