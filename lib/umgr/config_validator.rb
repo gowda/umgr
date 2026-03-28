@@ -20,6 +20,7 @@ module Umgr
       parsed = parse
       validate_root!(parsed)
       validate_resources!(parsed['resources'])
+      parsed
     end
 
     private

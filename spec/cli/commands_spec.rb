@@ -86,4 +86,37 @@ RSpec.describe 'umgr commands', :cli do
     expect(parsed['error']['type']).to eq('Umgr::Errors::ValidationError')
     expect(parsed['error']['message']).to match(/`version` must be a positive integer/)
   end
+
+  it 'preserves attributes and provider-specific resource fields in desired_state output' do
+    write_file(
+      'users.yml',
+      <<~YAML
+        version: 1
+        resources:
+          - provider: github
+            type: user
+            name: alice
+            attributes:
+              email: alice@example.com
+              first_name: Alice
+            org: platform
+            roles:
+              - admin
+              - writer
+      YAML
+    )
+
+    run_command("#{executable} validate --config users.yml")
+
+    expect(last_command_started).to have_exit_status(0)
+    parsed = JSON.parse(last_command_started.stdout)
+    resource = parsed.fetch('options').fetch('desired_state').fetch('resources').first
+
+    expect(resource['attributes']).to eq(
+      'email' => 'alice@example.com',
+      'first_name' => 'Alice'
+    )
+    expect(resource['org']).to eq('platform')
+    expect(resource['roles']).to eq(%w[admin writer])
+  end
 end

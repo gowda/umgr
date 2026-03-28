@@ -61,8 +61,8 @@ module Umgr
       resolved_options = options.dup
       resolved = resolve_config_path(options[:config])
       if resolved
-        ensure_valid_config(resolved)
-        return resolved_options.merge(config: resolved)
+        desired_state = ensure_valid_config(resolved)
+        return resolved_options.merge(config: resolved, desired_state: desired_state)
       end
 
       supported = AUTO_DISCOVERY_CONFIGS.join(', ')
