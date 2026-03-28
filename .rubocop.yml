@@ -1,0 +1,17 @@
+plugins:
+  - rubocop-performance
+
+AllCops:
+  NewCops: enable
+  TargetRubyVersion: 3.4
+
+Style/Documentation:
+  Enabled: false
+
+Style/FrozenStringLiteralComment:
+  Exclude:
+    - 'Gemfile'
+
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*.rb'

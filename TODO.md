@@ -8,11 +8,11 @@
     - [x] Commit created
 
 - [ ] Phase 1: Foundation + Shared Runtime
-  - [ ] Task 1.1: Scaffold gem, executable, Thor CLI wiring, RSpec/Aruba setup, RuboCop + rubocop-performance config
-    - [ ] CLI verification (Aruba)
-    - [ ] Library verification (RSpec)
-    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [ ] Commit created
+  - [x] Task 1.1: Scaffold gem, executable, Thor CLI wiring, RSpec/Aruba setup, RuboCop + rubocop-performance config
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
   - [ ] Task 1.2: Implement shared CLI->Runner command dispatch for init, validate, plan, apply, show, and import
     - [ ] CLI verification (Aruba)
     - [ ] Library verification (RSpec)

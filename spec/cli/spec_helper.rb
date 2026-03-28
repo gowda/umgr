@@ -1,0 +1,10 @@
+# frozen_string_literal: true
+
+require 'aruba/rspec'
+
+RSpec.configure do |config|
+  config.include Aruba::Api
+  config.before(:each, :cli) do
+    setup_aruba
+  end
+end
