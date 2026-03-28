@@ -13,7 +13,7 @@
     - [ ] Library verification (RSpec)
     - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
     - [ ] Commit created
-  - [ ] Task 1.2: Implement shared CLI->Runner command dispatch for init, validate, plan, apply, and show
+  - [ ] Task 1.2: Implement shared CLI->Runner command dispatch for init, validate, plan, apply, show, and import
     - [ ] CLI verification (Aruba)
     - [ ] Library verification (RSpec)
     - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
@@ -103,6 +103,11 @@
     - [ ] Library verification (RSpec)
     - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
     - [ ] Commit created
+  - [ ] Task 6.4: Implement explicit drift detection reporting in plan output and API results
+    - [ ] CLI verification (Aruba)
+    - [ ] Library verification (RSpec)
+    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [ ] Commit created
 
 - [ ] Phase 7: Apply Engine
   - [ ] Task 7.1: Implement apply execution and state persistence
@@ -116,6 +121,11 @@
     - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
     - [ ] Commit created
   - [ ] Task 7.3: Implement failure safety to prevent state corruption on apply errors
+    - [ ] CLI verification (Aruba)
+    - [ ] Library verification (RSpec)
+    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [ ] Commit created
+  - [ ] Task 7.4: Implement import command/API to fetch current users from providers/plugins into managed state
     - [ ] CLI verification (Aruba)
     - [ ] Library verification (RSpec)
     - [ ] Pre-commit checks passed (rubocop + rspec + aruba)

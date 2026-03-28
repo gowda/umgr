@@ -1,10 +1,11 @@
 # umgr
 
-`umgr` is a Ruby tool for managing user account state across platforms using a
-Terraform-like desired-state workflow.
+`umgr` is a declarative account lifecycle tool for managing user account state
+across platforms with a desired-state workflow.
 
 You declare desired state in a YAML or JSON configuration file, and `umgr`
-compares it with tracked current state to generate and apply changes.
+compares it with tracked current state to detect drift, import current users,
+and generate/apply changes.
 
 ## Motivation
 
@@ -20,6 +21,12 @@ Azure, and Sentry. This list is illustrative, not exhaustive.
 
 - CLI for operators (built with Thor)
 - Ruby gem API for embedding in larger applications
+
+## Core Capabilities
+
+- Drift detection between desired state and platform/user reality.
+- Import of current users from providers/plugins as a baseline state.
+- Declarative plan/apply workflow for account lifecycle changes.
 
 ## Provider/Plugin Model
 
