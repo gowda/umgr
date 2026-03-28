@@ -69,11 +69,11 @@
     - [x] Commit created
 
 - [ ] Phase 4: Provider Framework + Echo Provider
-  - [ ] Task 4.1: Define provider interface contract (validate/current/plan/apply) and registry
-    - [ ] CLI verification (Aruba)
-    - [ ] Library verification (RSpec)
-    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [ ] Commit created
+  - [x] Task 4.1: Define provider interface contract (validate/current/plan/apply) and registry
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
   - [ ] Task 4.2: Implement unknown-provider handling in validation/runtime flows
     - [ ] CLI verification (Aruba)
     - [ ] Library verification (RSpec)
