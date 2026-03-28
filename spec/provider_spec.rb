@@ -5,21 +5,21 @@ RSpec.describe Umgr::Provider do
 
   it 'raises for validate by default' do
     expect { provider.validate(resource: {}) }
-      .to raise_error(NotImplementedError, /must implement #validate/)
+      .to raise_error(Umgr::Errors::AbstractMethodError, /must implement #validate/)
   end
 
   it 'raises for current by default' do
     expect { provider.current(resource: {}) }
-      .to raise_error(NotImplementedError, /must implement #current/)
+      .to raise_error(Umgr::Errors::AbstractMethodError, /must implement #current/)
   end
 
   it 'raises for plan by default' do
     expect { provider.plan(desired: {}, current: {}) }
-      .to raise_error(NotImplementedError, /must implement #plan/)
+      .to raise_error(Umgr::Errors::AbstractMethodError, /must implement #plan/)
   end
 
   it 'raises for apply by default' do
     expect { provider.apply(changeset: {}) }
-      .to raise_error(NotImplementedError, /must implement #apply/)
+      .to raise_error(Umgr::Errors::AbstractMethodError, /must implement #apply/)
   end
 end
