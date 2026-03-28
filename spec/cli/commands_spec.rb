@@ -136,7 +136,7 @@ RSpec.describe 'umgr commands', :cli do
     expect(parsed['error']['message']).to match(/`version` must be a positive integer/)
   end
 
-  it 'preserves attributes and provider-specific resource fields in desired_state output' do
+  it 'returns validation error when provider is unknown' do
     write_file(
       'users.yml',
       <<~YAML
@@ -157,16 +157,11 @@ RSpec.describe 'umgr commands', :cli do
 
     run_command("#{executable} validate --config users.yml")
 
-    expect(last_command_started).to have_exit_status(0)
-    parsed = JSON.parse(last_command_started.stdout)
-    resource = parsed.fetch('options').fetch('desired_state').fetch('resources').first
-
-    expect(resource['attributes']).to eq(
-      'email' => 'alice@example.com',
-      'first_name' => 'Alice'
-    )
-    expect(resource['org']).to eq('platform')
-    expect(resource['roles']).to eq(%w[admin writer])
+    expect(last_command_started).to have_exit_status(Umgr::Errors::ValidationError::EXIT_CODE)
+    error_line = last_command_started.stderr.lines.map(&:strip).reject(&:empty?).last
+    parsed = JSON.parse(error_line)
+    expect(parsed['error']['type']).to eq('Umgr::Errors::ValidationError')
+    expect(parsed['error']['message']).to match(/Unknown provider\(s\) for validate: github/)
   end
 
   it 'returns state backend path for commands' do

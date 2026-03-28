@@ -6,8 +6,9 @@ module Umgr
     AUTO_DISCOVERY_CONFIGS = %w[umgr.yml umgr.yaml umgr.json].freeze
     INITIAL_STATE = { version: 1, resources: [].freeze }.freeze
 
-    def initialize(state_backend: nil)
+    def initialize(state_backend: nil, provider_registry: nil)
       @state_backend = state_backend || StateBackend.new
+      @provider_registry = provider_registry || ProviderRegistry.new
     end
 
     def ping
@@ -84,13 +85,20 @@ module Umgr
     def with_resolved_config(action, options)
       resolved_options = options.dup
       resolved = resolve_config_path(options[:config])
-      if resolved
-        desired_state = ensure_valid_config(resolved)
-        return resolved_options.merge(config: resolved, desired_state: desired_state)
-      end
+      return with_validated_config_options(action, resolved_options, resolved) if resolved
 
       supported = AUTO_DISCOVERY_CONFIGS.join(', ')
       raise Errors::ValidationError, "`config` is required for #{action}. Auto-discovery checks: #{supported}"
+    end
+
+    def with_validated_config_options(action, resolved_options, resolved)
+      desired_state = ensure_valid_config(resolved)
+      UnknownProviderGuard.validate!(
+        desired_state: desired_state,
+        action: action,
+        provider_registry: provider_registry
+      )
+      resolved_options.merge(config: resolved, desired_state: desired_state)
     end
 
     def resolve_config_path(config_path)
@@ -119,6 +127,6 @@ module Umgr
       DeepSymbolizer.call(ConfigValidator.validated_config(config_path))
     end
 
-    attr_reader :state_backend
+    attr_reader :state_backend, :provider_registry
   end
 end

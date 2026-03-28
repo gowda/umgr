@@ -4,6 +4,14 @@ require 'tmpdir'
 
 RSpec.describe Umgr::Runner do
   subject(:runner) { described_class.new }
+  let(:provider_class) do
+    Class.new do
+      def validate(resource:); end
+      def current(resource:); end
+      def plan(desired:, current:); end
+      def apply(changeset:); end
+    end
+  end
 
   it 'is instantiable' do
     expect(runner).to be_a(described_class)
@@ -160,6 +168,8 @@ RSpec.describe Umgr::Runner do
 
   it 'preserves attributes and provider-specific resource fields in desired_state' do
     Dir.mktmpdir do |tmp_dir|
+      registry = Umgr::ProviderRegistry.new
+      registry.register(:github, provider_class.new)
       File.write(
         File.join(tmp_dir, 'users.yml'),
         <<~YAML
@@ -178,7 +188,8 @@ RSpec.describe Umgr::Runner do
         YAML
       )
 
-      result = Dir.chdir(tmp_dir) { runner.dispatch(:validate, config: 'users.yml') }
+      local_runner = described_class.new(provider_registry: registry)
+      result = Dir.chdir(tmp_dir) { local_runner.dispatch(:validate, config: 'users.yml') }
       resource = result[:options][:desired_state][:resources].first
 
       expect(resource[:attributes]).to eq(
@@ -187,6 +198,27 @@ RSpec.describe Umgr::Runner do
       )
       expect(resource[:org]).to eq('platform')
       expect(resource[:roles]).to eq(%w[admin writer])
+    end
+  end
+
+  it 'raises validation error when provider is unknown in config-backed actions' do
+    Dir.mktmpdir do |tmp_dir|
+      File.write(
+        File.join(tmp_dir, 'users.yml'),
+        <<~YAML
+          version: 1
+          resources:
+            - provider: github
+              type: user
+              name: alice
+        YAML
+      )
+
+      %i[validate plan apply import].each do |action|
+        expect do
+          Dir.chdir(tmp_dir) { runner.dispatch(action, config: 'users.yml') }
+        end.to raise_error(Umgr::Errors::ValidationError, /Unknown provider\(s\) for #{action}: github/)
+      end
     end
   end
 
