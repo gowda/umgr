@@ -3,6 +3,7 @@
 module Umgr
   class Runner
     ACTIONS = %i[init validate plan apply show import].freeze
+    AUTO_DISCOVERY_CONFIGS = %w[umgr.yml umgr.yaml umgr.json].freeze
 
     def ping
       :ok
@@ -24,18 +25,18 @@ module Umgr
     end
 
     def validate(**options)
-      require_config!(:validate, options)
-      not_implemented(:validate, options)
+      resolved_options = with_resolved_config(:validate, options)
+      not_implemented(:validate, resolved_options)
     end
 
     def plan(**options)
-      require_config!(:plan, options)
-      not_implemented(:plan, options)
+      resolved_options = with_resolved_config(:plan, options)
+      not_implemented(:plan, resolved_options)
     end
 
     def apply(**options)
-      require_config!(:apply, options)
-      not_implemented(:apply, options)
+      resolved_options = with_resolved_config(:apply, options)
+      not_implemented(:apply, resolved_options)
     end
 
     def show(**options)
@@ -43,8 +44,8 @@ module Umgr
     end
 
     def import(**options)
-      require_config!(:import, options)
-      not_implemented(:import, options)
+      resolved_options = with_resolved_config(:import, options)
+      not_implemented(:import, resolved_options)
     end
 
     def not_implemented(action, options)
@@ -56,10 +57,35 @@ module Umgr
       }
     end
 
-    def require_config!(action, options)
-      return if options[:config] && !options[:config].empty?
+    def with_resolved_config(action, options)
+      resolved_options = options.dup
+      resolved = resolve_config_path(options[:config])
+      return resolved_options.merge(config: resolved) if resolved
 
-      raise Errors::ValidationError, "`config` is required for #{action}"
+      supported = AUTO_DISCOVERY_CONFIGS.join(', ')
+      raise Errors::ValidationError, "`config` is required for #{action}. Auto-discovery checks: #{supported}"
+    end
+
+    def resolve_config_path(config_path)
+      return explicit_config_path(config_path) if config_path && !config_path.empty?
+
+      discover_config_path
+    end
+
+    def explicit_config_path(config_path)
+      absolute_path = File.expand_path(config_path)
+      return absolute_path if File.file?(absolute_path)
+
+      raise Errors::ValidationError, "Config file not found: #{config_path}"
+    end
+
+    def discover_config_path
+      AUTO_DISCOVERY_CONFIGS.each do |candidate|
+        absolute_path = File.expand_path(candidate)
+        return absolute_path if File.file?(absolute_path)
+      end
+
+      nil
     end
   end
 end
