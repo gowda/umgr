@@ -52,11 +52,11 @@
     - [x] Commit created
 
 - [ ] Phase 3: State Backend + Visibility
-  - [ ] Task 3.1: Implement local state backend (.umgr/state.json) with atomic writes
-    - [ ] CLI verification (Aruba)
-    - [ ] Library verification (RSpec)
-    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [ ] Commit created
+  - [x] Task 3.1: Implement local state backend (.umgr/state.json) with atomic writes
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
   - [ ] Task 3.2: Implement init command/API for state initialization
     - [ ] CLI verification (Aruba)
     - [ ] Library verification (RSpec)

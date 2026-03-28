@@ -119,4 +119,12 @@ RSpec.describe 'umgr commands', :cli do
     expect(resource['org']).to eq('platform')
     expect(resource['roles']).to eq(%w[admin writer])
   end
+
+  it 'returns state backend path for commands' do
+    run_command("#{executable} init")
+
+    expect(last_command_started).to have_exit_status(0)
+    parsed = JSON.parse(last_command_started.stdout)
+    expect(parsed['state_path']).to end_with('/.umgr/state.json')
+  end
 end

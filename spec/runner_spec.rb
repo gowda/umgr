@@ -20,6 +20,7 @@ RSpec.describe Umgr::Runner do
       expect(result[:action]).to eq(action.to_s)
       expect(result[:status]).to eq('not_implemented')
       expect(result[:ok]).to eq(false)
+      expect(result[:state_path]).to end_with('/.umgr/state.json')
     end
   end
 
