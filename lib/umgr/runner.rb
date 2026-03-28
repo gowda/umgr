@@ -92,7 +92,29 @@ module Umgr
     end
 
     def ensure_valid_config(config_path)
-      ConfigValidator.validate!(config_path)
+      deep_symbolize_keys(ConfigValidator.validated_config(config_path))
+    end
+
+    def deep_symbolize_keys(value)
+      case value
+      when Hash
+        symbolize_hash(value)
+      when Array
+        symbolize_array(value)
+      else
+        value
+      end
+    end
+
+    def symbolize_hash(value)
+      value.each_with_object({}) do |(key, nested_value), memo|
+        symbol_key = key.is_a?(String) ? key.to_sym : key
+        memo[symbol_key] = deep_symbolize_keys(nested_value)
+      end
+    end
+
+    def symbolize_array(value)
+      value.map { |item| deep_symbolize_keys(item) }
     end
   end
 end

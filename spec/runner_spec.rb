@@ -117,14 +117,14 @@ RSpec.describe Umgr::Runner do
       )
 
       result = Dir.chdir(tmp_dir) { runner.dispatch(:validate, config: 'users.yml') }
-      resource = result[:options][:desired_state]['resources'].first
+      resource = result[:options][:desired_state][:resources].first
 
-      expect(resource['attributes']).to eq(
-        'email' => 'alice@example.com',
-        'first_name' => 'Alice'
+      expect(resource[:attributes]).to eq(
+        email: 'alice@example.com',
+        first_name: 'Alice'
       )
-      expect(resource['org']).to eq('platform')
-      expect(resource['roles']).to eq(%w[admin writer])
+      expect(resource[:org]).to eq('platform')
+      expect(resource[:roles]).to eq(%w[admin writer])
     end
   end
 
