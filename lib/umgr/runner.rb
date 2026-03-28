@@ -11,7 +11,7 @@ module Umgr
     # rubocop:disable Style/ArgumentsForwarding
     def dispatch(action, **options)
       action_name = action.to_sym
-      raise ArgumentError, "Unknown action: #{action}" unless ACTIONS.include?(action_name)
+      raise Errors::UnknownActionError, "Unknown action: #{action}" unless ACTIONS.include?(action_name)
 
       send(action_name, **options)
     end
@@ -24,14 +24,17 @@ module Umgr
     end
 
     def validate(**options)
+      require_config!(:validate, options)
       not_implemented(:validate, options)
     end
 
     def plan(**options)
+      require_config!(:plan, options)
       not_implemented(:plan, options)
     end
 
     def apply(**options)
+      require_config!(:apply, options)
       not_implemented(:apply, options)
     end
 
@@ -40,6 +43,7 @@ module Umgr
     end
 
     def import(**options)
+      require_config!(:import, options)
       not_implemented(:import, options)
     end
 
@@ -50,6 +54,12 @@ module Umgr
         status: 'not_implemented',
         options: options
       }
+    end
+
+    def require_config!(action, options)
+      return if options[:config] && !options[:config].empty?
+
+      raise Errors::ValidationError, "`config` is required for #{action}"
     end
   end
 end

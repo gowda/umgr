@@ -12,7 +12,7 @@ RSpec.describe Umgr::Runner do
   end
 
   it 'dispatches all supported actions' do
-    described_class::ACTIONS.each do |action|
+    %i[init show].each do |action|
       result = runner.dispatch(action)
 
       expect(result[:action]).to eq(action.to_s)
@@ -27,6 +27,11 @@ RSpec.describe Umgr::Runner do
     expect(result[:options]).to eq({ config: 'users.yml' })
   end
 
+  it 'raises validation error when required config is missing' do
+    expect { runner.dispatch(:validate) }
+      .to raise_error(Umgr::Errors::ValidationError, /config/)
+  end
+
   it 'keeps action methods private' do
     described_class::ACTIONS.each do |action|
       expect(runner).not_to respond_to(action)
@@ -34,6 +39,7 @@ RSpec.describe Umgr::Runner do
   end
 
   it 'raises for unsupported actions' do
-    expect { runner.dispatch(:unknown) }.to raise_error(ArgumentError, /Unknown action/)
+    expect { runner.dispatch(:unknown) }
+      .to raise_error(Umgr::Errors::UnknownActionError, /Unknown action/)
   end
 end
