@@ -25,18 +25,18 @@ module Umgr
     end
 
     def validate(**options)
-      require_config!(:validate, options)
-      not_implemented(:validate, options)
+      resolved_options = with_resolved_config(:validate, options)
+      not_implemented(:validate, resolved_options)
     end
 
     def plan(**options)
-      require_config!(:plan, options)
-      not_implemented(:plan, options)
+      resolved_options = with_resolved_config(:plan, options)
+      not_implemented(:plan, resolved_options)
     end
 
     def apply(**options)
-      require_config!(:apply, options)
-      not_implemented(:apply, options)
+      resolved_options = with_resolved_config(:apply, options)
+      not_implemented(:apply, resolved_options)
     end
 
     def show(**options)
@@ -44,8 +44,8 @@ module Umgr
     end
 
     def import(**options)
-      require_config!(:import, options)
-      not_implemented(:import, options)
+      resolved_options = with_resolved_config(:import, options)
+      not_implemented(:import, resolved_options)
     end
 
     def not_implemented(action, options)
@@ -57,9 +57,10 @@ module Umgr
       }
     end
 
-    def require_config!(action, options)
+    def with_resolved_config(action, options)
+      resolved_options = options.dup
       resolved = resolve_config_path(options[:config])
-      return options[:config] = resolved if resolved
+      return resolved_options.merge(config: resolved) if resolved
 
       supported = AUTO_DISCOVERY_CONFIGS.join(', ')
       raise Errors::ValidationError, "`config` is required for #{action}. Auto-discovery checks: #{supported}"
