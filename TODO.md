@@ -34,7 +34,7 @@
     - [x] Run required checks including actionlint
     - [x] Commit created
 
-- [ ] Phase 2: Config + Validation
+- [x] Phase 2: Config + Validation
   - [x] Task 2.1: Support YAML/JSON config auto-discovery and --config override
     - [x] CLI verification (Aruba)
     - [x] Library verification (RSpec)
@@ -45,11 +45,11 @@
     - [x] Library verification (RSpec)
     - [x] Pre-commit checks passed (rubocop + rspec + aruba)
     - [x] Commit created
-  - [ ] Task 2.3: Preserve hybrid payload fields (attributes + provider-specific options)
-    - [ ] CLI verification (Aruba)
-    - [ ] Library verification (RSpec)
-    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [ ] Commit created
+  - [x] Task 2.3: Preserve hybrid payload fields (attributes + provider-specific options)
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
 
 - [ ] Phase 3: State Backend + Visibility
   - [ ] Task 3.1: Implement local state backend (.umgr/state.json) with atomic writes

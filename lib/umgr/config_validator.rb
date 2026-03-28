@@ -8,6 +8,10 @@ module Umgr
     REQUIRED_TOP_LEVEL_KEYS = %w[version resources].freeze
     REQUIRED_RESOURCE_FIELDS = %w[provider type name].freeze
 
+    def self.validated_config(config_path)
+      new(config_path).validated_config
+    end
+
     def self.validate!(config_path)
       new(config_path).validate!
     end
@@ -16,10 +20,16 @@ module Umgr
       @config_path = config_path
     end
 
-    def validate!
+    def validated_config
       parsed = parse
       validate_root!(parsed)
       validate_resources!(parsed['resources'])
+      parsed
+    end
+
+    def validate!
+      validated_config
+      nil
     end
 
     private

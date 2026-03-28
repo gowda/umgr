@@ -96,6 +96,38 @@ RSpec.describe Umgr::Runner do
     end
   end
 
+  it 'preserves attributes and provider-specific resource fields in desired_state' do
+    Dir.mktmpdir do |tmp_dir|
+      File.write(
+        File.join(tmp_dir, 'users.yml'),
+        <<~YAML
+          version: 1
+          resources:
+            - provider: github
+              type: user
+              name: alice
+              attributes:
+                email: alice@example.com
+                first_name: Alice
+              org: platform
+              roles:
+                - admin
+                - writer
+        YAML
+      )
+
+      result = Dir.chdir(tmp_dir) { runner.dispatch(:validate, config: 'users.yml') }
+      resource = result[:options][:desired_state][:resources].first
+
+      expect(resource[:attributes]).to eq(
+        email: 'alice@example.com',
+        first_name: 'Alice'
+      )
+      expect(resource[:org]).to eq('platform')
+      expect(resource[:roles]).to eq(%w[admin writer])
+    end
+  end
+
   it 'keeps action methods private' do
     described_class::ACTIONS.each do |action|
       expect(runner).not_to respond_to(action)
