@@ -64,7 +64,11 @@ module Umgr
 
     def import(**options)
       resolved_options = with_resolved_config(:import, options)
-      not_implemented(:import, resolved_options)
+      ImportResultBuilder.call(
+        state_backend: state_backend,
+        options: resolved_options,
+        provider_registry: provider_registry
+      )
     end
 
     def not_implemented(action, options)

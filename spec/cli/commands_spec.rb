@@ -7,8 +7,7 @@ RSpec.describe 'umgr commands', :cli do
   let(:executable) { File.expand_path('../../exe/umgr', __dir__) }
 
   command_invocations = {
-    'validate' => '--config users.yml',
-    'import' => '--config users.yml'
+    'validate' => '--config users.yml'
   }
 
   command_invocations.each do |command, args|
@@ -172,6 +171,42 @@ RSpec.describe 'umgr commands', :cli do
         'delete' => 0,
         'no_change' => 1
       }
+    )
+  end
+
+  it 'imports current users and persists imported state as json' do
+    write_file(
+      'users.yml',
+      <<~YAML
+        version: 1
+        resources:
+          - provider: echo
+            type: user
+            name: alice
+            attributes:
+              team: platform
+      YAML
+    )
+
+    run_command("#{executable} import --config users.yml")
+
+    expect(last_command_started).to have_exit_status(0)
+    parsed = JSON.parse(last_command_started.stdout)
+
+    expect(parsed['ok']).to eq(true)
+    expect(parsed['action']).to eq('import')
+    expect(parsed['status']).to eq('imported')
+    expect(parsed['imported_count']).to eq(1)
+    expect(parsed.fetch('state').fetch('resources')).to eq(
+      [
+        {
+          'provider' => 'echo',
+          'type' => 'user',
+          'name' => 'alice',
+          'attributes' => { 'team' => 'platform' },
+          'identity' => 'echo.user.alice'
+        }
+      ]
     )
   end
 

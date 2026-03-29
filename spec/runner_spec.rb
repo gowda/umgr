@@ -17,7 +17,7 @@ RSpec.describe Umgr::Runner do
     Dir.mktmpdir do |tmp_dir|
       File.write(File.join(tmp_dir, 'users.yml'), "version: 1\nresources: []\n")
 
-      %i[validate import].each do |action|
+      %i[validate].each do |action|
         result = Dir.chdir(tmp_dir) { runner.dispatch(action, config: 'users.yml') }
 
         expect(result[:action]).to eq(action.to_s)
@@ -25,6 +25,43 @@ RSpec.describe Umgr::Runner do
         expect(result[:ok]).to eq(false)
         expect(result[:state_path]).to end_with('/.umgr/state.json')
       end
+    end
+  end
+
+  it 'imports current users from providers and persists imported state' do
+    Dir.mktmpdir do |tmp_dir|
+      backend = Umgr::StateBackend.new(root_dir: tmp_dir)
+      local_runner = described_class.new(state_backend: backend)
+      File.write(
+        File.join(tmp_dir, 'users.yml'),
+        <<~YAML
+          version: 1
+          resources:
+            - provider: echo
+              type: user
+              name: alice
+              attributes:
+                team: platform
+        YAML
+      )
+
+      result = Dir.chdir(tmp_dir) { local_runner.dispatch(:import, config: 'users.yml') }
+
+      expect(result[:ok]).to eq(true)
+      expect(result[:status]).to eq('imported')
+      expect(result[:imported_count]).to eq(1)
+      expect(result.fetch(:state).fetch(:resources)).to eq(
+        [
+          {
+            provider: 'echo',
+            type: 'user',
+            name: 'alice',
+            attributes: { team: 'platform' },
+            identity: 'echo.user.alice'
+          }
+        ]
+      )
+      expect(backend.read).to eq(result.fetch(:state))
     end
   end
 

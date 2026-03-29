@@ -287,11 +287,15 @@
     - [x] Pre-commit checks passed (rubocop + rspec + aruba)
     - [x] Commit created
     </details>
-  - [ ] Task 8.4: Implement import command/API to fetch current users from providers/plugins into managed state
-    - [ ] CLI verification (Aruba)
-    - [ ] Library verification (RSpec)
-    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [ ] Commit created
+  - [x] Task 8.4: Implement import command/API to fetch current users from providers/plugins into managed state
+    <details>
+    <summary>Checklist</summary>
+
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
+    </details>
 
 - [ ] Phase 9: Hardening + Docs Consistency
   - [ ] Task 9.1: Add end-to-end workflow coverage (init -> validate -> plan -> apply -> show)
