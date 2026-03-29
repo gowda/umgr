@@ -19,7 +19,7 @@ RSpec.describe Umgr::Providers::GithubProvider do
   it 'validates provider-specific configuration' do
     result = provider.validate(resource: resource)
 
-    expect(result[:ok]).to eq(true)
+    expect(result[:ok]).to be(true)
     expect(result[:provider]).to eq('github')
     expect(result[:resource]).to eq(resource)
   end
@@ -79,7 +79,7 @@ RSpec.describe Umgr::Providers::GithubProvider do
 
     result = provider.current(resource: resource.merge(token: 'secret'))
 
-    expect(result[:ok]).to eq(true)
+    expect(result[:ok]).to be(true)
     expect(result[:provider]).to eq('github')
     expect(result[:org]).to eq('acme')
     expect(result[:count]).to eq(1)
@@ -131,7 +131,7 @@ RSpec.describe Umgr::Providers::GithubProvider do
 
     result = provider.current(resource: resource)
 
-    expect(result[:ok]).to eq(true)
+    expect(result[:ok]).to be(true)
     expect(result[:count]).to eq(0)
   end
 

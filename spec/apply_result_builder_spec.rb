@@ -27,8 +27,10 @@ RSpec.describe Umgr::ApplyResultBuilder do
     allow(state_backend).to receive(:write) { |new_state| stored_state = new_state }
     allow(state_backend).to receive(:delete)
     allow(provider_registry).to receive(:fetch).with('echo').and_return(provider)
-    allow(provider).to receive(:plan).and_return(ok: true, provider: 'echo', status: 'planned')
-    allow(provider).to receive(:apply).and_return(ok: true, provider: 'echo', status: 'applied')
+    allow(provider).to receive_messages(
+      plan: { ok: true, provider: 'echo', status: 'planned' },
+      apply: { ok: true, provider: 'echo', status: 'applied' }
+    )
   end
 
   it 'applies changes and persists desired state' do
@@ -38,7 +40,7 @@ RSpec.describe Umgr::ApplyResultBuilder do
       provider_registry: provider_registry
     )
 
-    expect(result[:ok]).to eq(true)
+    expect(result[:ok]).to be(true)
     expect(result[:status]).to eq('applied')
     expect(result.fetch(:state)).to eq(version: 1, resources: desired_state[:resources])
     expect(result.fetch(:apply_results).first.fetch(:status)).to eq('applied')
@@ -53,8 +55,6 @@ RSpec.describe Umgr::ApplyResultBuilder do
   it 'does not persist state if provider apply returns ok: false' do
     allow(provider).to receive(:apply).and_return(ok: false, error: 'boom')
 
-    expect(state_backend).not_to receive(:write)
-    expect(state_backend).not_to receive(:delete)
     expect do
       described_class.call(
         state_backend: state_backend,
@@ -62,6 +62,8 @@ RSpec.describe Umgr::ApplyResultBuilder do
         provider_registry: provider_registry
       )
     end.to raise_error(Umgr::Errors::InternalError, /Provider apply failed/)
+    expect(state_backend).not_to have_received(:write)
+    expect(state_backend).not_to have_received(:delete)
   end
 
   it 'skips no_change operations without invoking provider apply' do
@@ -77,14 +79,13 @@ RSpec.describe Umgr::ApplyResultBuilder do
 
     expect(provider).not_to have_received(:apply)
     expect(result.fetch(:apply_results).first).to include(action: 'no_change', status: 'skipped')
-    expect(result.fetch(:idempotency).fetch(:stable)).to eq(true)
+    expect(result.fetch(:idempotency).fetch(:stable)).to be(true)
   end
 
   it 'rolls back to previous state when post-apply plan still includes changes' do
     writes = []
     allow(state_backend).to receive(:read).and_return(persisted_state)
     allow(state_backend).to receive(:write) { |new_state| writes << new_state }
-    expect(state_backend).not_to receive(:delete)
 
     expect do
       described_class.call(
@@ -94,12 +95,12 @@ RSpec.describe Umgr::ApplyResultBuilder do
       )
     end.to raise_error(Umgr::Errors::InternalError, /Apply is not idempotent/)
     expect(writes).to eq([{ version: 1, resources: desired_state[:resources] }, persisted_state])
+    expect(state_backend).not_to have_received(:delete)
   end
 
   it 'removes written state on rollback when no previous state existed' do
     allow(state_backend).to receive(:read).and_return(nil)
     allow(state_backend).to receive(:write)
-    expect(state_backend).to receive(:delete).once
 
     expect do
       described_class.call(
@@ -108,6 +109,7 @@ RSpec.describe Umgr::ApplyResultBuilder do
         provider_registry: provider_registry
       )
     end.to raise_error(Umgr::Errors::InternalError, /Apply is not idempotent/)
+    expect(state_backend).to have_received(:delete).once
   end
 
   it 'preserves original error when rollback itself fails' do
@@ -117,7 +119,6 @@ RSpec.describe Umgr::ApplyResultBuilder do
       write_count += 1
       raise Errno::ENOSPC, 'disk full during rollback' if write_count == 2
     end
-    expect(state_backend).not_to receive(:delete)
     allow(described_class).to receive(:warn)
 
     expect do
@@ -127,6 +128,7 @@ RSpec.describe Umgr::ApplyResultBuilder do
         provider_registry: provider_registry
       )
     end.to raise_error(Umgr::Errors::InternalError, /Apply is not idempotent/)
+    expect(state_backend).not_to have_received(:delete)
     expect(described_class).to have_received(:warn).with(/Rollback failed after apply error/)
   end
 

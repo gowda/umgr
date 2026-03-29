@@ -22,7 +22,7 @@ RSpec.describe Umgr::Runner do
 
         expect(result[:action]).to eq(action.to_s)
         expect(result[:status]).to eq('not_implemented')
-        expect(result[:ok]).to eq(false)
+        expect(result[:ok]).to be(false)
         expect(result[:state_path]).to end_with('/.umgr/state.json')
       end
     end
@@ -47,7 +47,7 @@ RSpec.describe Umgr::Runner do
 
       result = Dir.chdir(tmp_dir) { local_runner.dispatch(:import, config: 'users.yml') }
 
-      expect(result[:ok]).to eq(true)
+      expect(result[:ok]).to be(true)
       expect(result[:status]).to eq('imported')
       expect(result[:imported_count]).to eq(1)
       expect(result.fetch(:state).fetch(:resources)).to eq(
@@ -125,7 +125,7 @@ RSpec.describe Umgr::Runner do
 
       result = Dir.chdir(tmp_dir) { local_runner.dispatch(:apply, config: 'users.yml') }
 
-      expect(result[:ok]).to eq(true)
+      expect(result[:ok]).to be(true)
       expect(result[:status]).to eq('applied')
       expect(result.fetch(:changeset).fetch(:summary)).to eq(create: 1, update: 1, delete: 0, no_change: 0)
       expect(result.fetch(:apply_results).map { |item| item[:status] }).to eq(%w[applied applied])
@@ -249,7 +249,7 @@ RSpec.describe Umgr::Runner do
       result = Dir.chdir(tmp_dir) { local_runner.dispatch(:plan, config: 'users.yml') }
       changes = result.fetch(:changeset).fetch(:changes)
 
-      expect(result[:ok]).to eq(true)
+      expect(result[:ok]).to be(true)
       expect(result[:status]).to eq('planned')
       expect(changes.map { |change| [change[:identity], change[:action]] }).to eq(
         [
@@ -323,9 +323,9 @@ RSpec.describe Umgr::Runner do
 
       result = local_runner.dispatch(:show)
 
-      expect(result[:ok]).to eq(true)
+      expect(result[:ok]).to be(true)
       expect(result[:status]).to eq('not_initialized')
-      expect(result[:state]).to eq(nil)
+      expect(result[:state]).to be_nil
       expect(result[:state_path]).to eq(File.join(tmp_dir, '.umgr', 'state.json'))
     end
   end
@@ -338,7 +338,7 @@ RSpec.describe Umgr::Runner do
 
       result = local_runner.dispatch(:show)
 
-      expect(result[:ok]).to eq(true)
+      expect(result[:ok]).to be(true)
       expect(result[:status]).to eq('ok')
       expect(result[:state]).to eq(version: 1, resources: [{ provider: 'github', type: 'user', name: 'alice' }])
     end
@@ -351,10 +351,10 @@ RSpec.describe Umgr::Runner do
 
       result = local_runner.dispatch(:init)
 
-      expect(result[:ok]).to eq(true)
+      expect(result[:ok]).to be(true)
       expect(result[:status]).to eq('initialized')
       expect(result[:state]).to eq(version: 1, resources: [])
-      expect(File.file?(File.join(tmp_dir, '.umgr', 'state.json'))).to eq(true)
+      expect(File.file?(File.join(tmp_dir, '.umgr', 'state.json'))).to be(true)
       expect(backend.read).to eq(version: 1, resources: [])
     end
   end
@@ -367,7 +367,7 @@ RSpec.describe Umgr::Runner do
 
       result = local_runner.dispatch(:init)
 
-      expect(result[:ok]).to eq(true)
+      expect(result[:ok]).to be(true)
       expect(result[:status]).to eq('already_initialized')
       expect(result[:state]).to eq(version: 1, resources: [{ provider: 'github', type: 'user', name: 'alice' }])
     end

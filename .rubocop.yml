@@ -1,6 +1,3 @@
-inherit_from:
-  - .rubocop_todo.yml
-
 plugins:
   - rubocop-performance
   - rubocop-rspec
@@ -19,3 +16,17 @@ Style/FrozenStringLiteralComment:
 Metrics/BlockLength:
   Exclude:
     - 'spec/**/*.rb'
+
+RSpec/SpecFilePathFormat:
+  CustomTransform:
+    Umgr: ''
+
+RSpec/ExampleLength:
+  Max: 60
+
+RSpec/MultipleExpectations:
+  Max: 15
+
+RSpec/DescribeClass:
+  Exclude:
+    - 'spec/cli/**/*_spec.rb'
