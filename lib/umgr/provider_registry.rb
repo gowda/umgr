@@ -4,6 +4,7 @@ module Umgr
   class ProviderRegistry
     def initialize
       @providers = {}
+      register(:echo, Providers::EchoProvider.new)
     end
 
     def register(name, provider)

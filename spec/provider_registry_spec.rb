@@ -16,13 +16,14 @@ RSpec.describe Umgr::ProviderRegistry do
 
     expect(registry.fetch(:github)).to eq(provider)
     expect(registry.fetch('github')).to eq(provider)
+    expect(registry.fetch(:echo)).to be_a(Umgr::Providers::EchoProvider)
   end
 
   it 'lists registered provider names' do
     registry.register(:slack, provider)
     registry.register('github', provider)
 
-    expect(registry.names).to eq(%i[github slack])
+    expect(registry.names).to eq(%i[echo github slack])
   end
 
   it 'raises for empty provider names' do
