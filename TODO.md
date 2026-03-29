@@ -166,6 +166,11 @@
 - [ ] Phase 11: Post-Release DSL Config Generator
   - [ ] Task 11.1: Add Ruby DSL compiler that generates authoritative YAML/JSON config output (DSL is not runtime source)
     - [ ] Define deterministic compile command (`umgr compile`) and output path policy
+    - [ ] Define DSL/config precedence policy for runtime commands (`validate/plan/apply/import`)
+    - [ ] Fail fast on auto-discovery ambiguity when both `umgr.rb` and `umgr.{yml,yaml,json}` exist
+    - [ ] Define explicit stdin contract: support `--config -` for piped compiled config
+    - [ ] Add pipeline example: `umgr compile | umgr plan --config -`
+    - [ ] Add pipeline example: `umgr compile | umgr apply --config -`
     - [ ] Ensure compiled output strictly conforms to existing config schema validation
     - [ ] CLI verification (Aruba)
     - [ ] Library verification (RSpec)
@@ -180,6 +185,9 @@
     - [ ] Commit created
   - [ ] Task 11.3: Add DSL safety rails and docs
     - [ ] Restrict side effects in DSL evaluation context and document recommended usage patterns
+    - [ ] Document precedence matrix (explicit `--config` vs `--config -` vs auto-discovery)
+    - [ ] Document ambiguity error messaging and resolution steps (`--config` or compile pipeline)
+    - [ ] Clarify runtime commands never execute DSL directly; DSL must be compiled
     - [ ] Add examples showing DSL -> compiled YAML/JSON workflow
     - [ ] Update README with explicit guidance: compile output is canonical input for `validate/plan/apply/import`
     - [ ] CLI verification (Aruba)
