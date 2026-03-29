@@ -97,11 +97,11 @@
     - [x] Commit created
 
 - [ ] Phase 9: Hardening + Docs Consistency
-  - [ ] Task 9.1: Add end-to-end workflow coverage (init -> validate -> plan -> apply -> show)
-    - [ ] CLI verification (Aruba)
-    - [ ] Library verification (RSpec)
-    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [ ] Commit created
+  - [x] Task 9.1: Add end-to-end workflow coverage (init -> validate -> plan -> apply -> show)
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
   - [ ] Task 9.1a: Re-enable `rubocop-rspec` cops and align test suite with enforced guidelines
     - [ ] Burn down and remove temporary `rubocop-rspec` suppressions from `.rubocop_todo.yml`
     - [ ] Refactor specs to satisfy the re-enabled cops without reducing coverage quality
