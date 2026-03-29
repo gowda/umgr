@@ -96,7 +96,7 @@
     - [x] Pre-commit checks passed (rubocop + rspec + aruba)
     - [x] Commit created
 
-- [ ] Phase 9: Hardening + Docs Consistency
+- [x] Phase 9: Hardening + Docs Consistency
   - [x] Task 9.1: Add end-to-end workflow coverage (init -> validate -> plan -> apply -> show)
     - [x] CLI verification (Aruba)
     - [x] Library verification (RSpec)
@@ -119,18 +119,19 @@
     - [x] Library verification (RSpec)
     - [x] Pre-commit checks passed (rubocop + rspec + aruba)
     - [x] Commit created
-  - [ ] Task 9.4: Add static GitHub Pages website for umgr (single-page, precise/exhaustive, no bloat)
-    - [ ] Create static `docs/index.html` + minimal CSS assets (no Jekyll generation pipeline)
-    - [ ] Ensure content includes accurate code samples for CLI and Gemfile usage
-    - [ ] Configure GitHub Pages deployment workflow for static `docs/` content
-    - [ ] Document local preview/edit workflow for website content
-    - [ ] Mark as required prerequisite before private package publishing work begins
-    - [ ] CLI verification (Aruba)
-    - [ ] Library verification (RSpec)
-    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [ ] Commit created
+  - [x] Task 9.4: Add static GitHub Pages website for umgr (single-page, precise/exhaustive, no bloat)
+    - [x] Create static `docs/index.html` + minimal CSS assets (no Jekyll generation pipeline)
+    - [x] Ensure content includes accurate code samples for CLI and Gemfile usage
+    - [x] Configure GitHub Pages deployment workflow for static `docs/` content
+    - [x] Document local preview/edit workflow for website content
+    - [x] Mark as required prerequisite before private package publishing work begins
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
 
 - [ ] Phase 10: Release + Distribution
+  - [x] Prerequisite: Task 9.4 static website is completed before publishing work
   - [ ] Task 10.1: Add private publish workflow for GitHub Packages triggered by GitHub Release publish event
     - [ ] Use `on: release` with `types: [published]`
     - [ ] Configure publish auth using `GITHUB_TOKEN` with required package permissions

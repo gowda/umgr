@@ -44,6 +44,10 @@ Each platform integration is implemented as a provider/plugin.
 Provider authoring guide:
 [`docs/provider-authoring.md`](docs/provider-authoring.md)
 
+Website:
+- Site entrypoint: [`docs/index.html`](docs/index.html)
+- Local preview/edit guide: [`docs/website.md`](docs/website.md)
+
 ## Configuration and State
 
 - Configuration formats: YAML and JSON
