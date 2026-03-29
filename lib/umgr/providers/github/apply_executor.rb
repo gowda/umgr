@@ -39,7 +39,7 @@ module Umgr
         handler = operation_handlers(api_client, org, token)[operation[:type]]
         return handler.call(operation) if handler
 
-        raise Errors::ValidationError, "Unsupported GitHub apply operation: #{operation[:type]}"
+        raise Errors::InternalError, "Unsupported GitHub apply operation: #{operation[:type]}"
       end
 
       def operation_handlers(api_client, org, token)

@@ -5,7 +5,6 @@ module Umgr
     include RunnerConfig
 
     ACTIONS = %i[init validate plan apply show import].freeze
-    AUTO_DISCOVERY_CONFIGS = %w[umgr.yml umgr.yaml umgr.json].freeze
 
     def initialize(state_backend: nil, provider_registry: nil)
       @state_backend = state_backend || StateBackend.new

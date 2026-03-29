@@ -61,4 +61,12 @@ RSpec.describe Umgr::ApplyResultBuilder do
     expect(provider).not_to have_received(:apply)
     expect(result.fetch(:apply_results).first).to include(action: 'no_change', status: 'skipped')
   end
+
+  it 'raises internal error when change does not include provider information' do
+    change = { identity: 'missing.provider', action: 'update', desired: nil, current: nil }
+
+    expect do
+      described_class.send(:apply_change, change, provider_registry)
+    end.to raise_error(Umgr::Errors::InternalError, /Missing provider/)
+  end
 end

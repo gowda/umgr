@@ -263,6 +263,6 @@ RSpec.describe Umgr::Providers::GithubProvider do
           provider_plan: { operations: [{ type: 'mystery', login: 'alice' }] }
         }
       )
-    end.to raise_error(Umgr::Errors::ValidationError, /Unsupported GitHub apply operation/)
+    end.to raise_error(Umgr::Errors::InternalError, /Unsupported GitHub apply operation/)
   end
 end

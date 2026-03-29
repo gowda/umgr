@@ -2,6 +2,8 @@
 
 module Umgr
   module RunnerConfig
+    AUTO_DISCOVERY_CONFIGS = %w[umgr.yml umgr.yaml umgr.json].freeze
+
     private
 
     def with_resolved_config(action, options)
@@ -10,7 +12,7 @@ module Umgr
       if resolved
         with_validated_config_options(action, resolved_options, resolved)
       else
-        supported = Runner::AUTO_DISCOVERY_CONFIGS.join(', ')
+        supported = AUTO_DISCOVERY_CONFIGS.join(', ')
         raise Errors::ValidationError, "`config` is required for #{action}. Auto-discovery checks: #{supported}"
       end
     end
@@ -34,7 +36,7 @@ module Umgr
     end
 
     def discover_config_path
-      Runner::AUTO_DISCOVERY_CONFIGS.each do |candidate|
+      AUTO_DISCOVERY_CONFIGS.each do |candidate|
         absolute_path = File.expand_path(candidate)
         return absolute_path if File.file?(absolute_path)
       end
