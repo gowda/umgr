@@ -40,8 +40,8 @@ Each platform integration is implemented as a provider/plugin.
 - The first built-in test provider is `echo`, which returns a fake user account
   by echoing configured attributes.
 
-Detailed provider authoring documentation will be added after the first provider
-implementation.
+Provider authoring guide:
+[`docs/provider-authoring.md`](docs/provider-authoring.md)
 
 ## Configuration and State
 
