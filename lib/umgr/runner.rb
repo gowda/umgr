@@ -41,7 +41,7 @@ module Umgr
 
     def plan(**options)
       resolved_options = with_resolved_config(:plan, options)
-      not_implemented(:plan, resolved_options)
+      PlanResultBuilder.call(state_backend: state_backend, options: resolved_options)
     end
 
     def apply(**options)

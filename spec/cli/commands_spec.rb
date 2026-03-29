@@ -8,7 +8,6 @@ RSpec.describe 'umgr commands', :cli do
 
   command_invocations = {
     'validate' => '--config users.yml',
-    'plan' => '--config users.yml',
     'apply' => '--config users.yml',
     'import' => '--config users.yml'
   }
@@ -83,6 +82,56 @@ RSpec.describe 'umgr commands', :cli do
     expect(last_command_started).to have_exit_status(0)
     parsed = JSON.parse(last_command_started.stdout)
     expect(parsed['options']['config']).to end_with('users.yml')
+  end
+
+  it 'returns planned changeset for desired vs current state' do
+    write_file(
+      'users.yml',
+      <<~YAML
+        version: 1
+        resources:
+          - provider: echo
+            type: user
+            name: alice
+            attributes:
+              team: platform
+          - provider: echo
+            type: user
+            name: carla
+      YAML
+    )
+    write_file(
+      '.umgr/state.json',
+      JSON.generate(
+        version: 1,
+        resources: [
+          { provider: 'echo', type: 'user', name: 'alice', attributes: { team: 'infra' } },
+          { provider: 'echo', type: 'user', name: 'bob' }
+        ]
+      )
+    )
+
+    run_command("#{executable} plan --config users.yml")
+
+    expect(last_command_started).to have_exit_status(0)
+    parsed = JSON.parse(last_command_started.stdout)
+    changes = parsed.fetch('changeset').fetch('changes')
+
+    expect(parsed['ok']).to eq(true)
+    expect(parsed['status']).to eq('planned')
+    expect(changes.map { |change| [change['identity'], change['action']] }).to eq(
+      [
+        ['echo.user.alice', 'update'],
+        ['echo.user.bob', 'delete'],
+        ['echo.user.carla', 'create']
+      ]
+    )
+    expect(parsed.fetch('changeset').fetch('summary')).to eq(
+      'create' => 1,
+      'update' => 1,
+      'delete' => 1,
+      'no_change' => 0
+    )
   end
 
   it 'auto-discovers config for validate when --config is omitted' do

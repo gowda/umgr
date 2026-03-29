@@ -17,7 +17,7 @@ RSpec.describe Umgr::Runner do
     Dir.mktmpdir do |tmp_dir|
       File.write(File.join(tmp_dir, 'users.yml'), "version: 1\nresources: []\n")
 
-      %i[validate plan apply import].each do |action|
+      %i[validate apply import].each do |action|
         result = Dir.chdir(tmp_dir) { runner.dispatch(action, config: 'users.yml') }
 
         expect(result[:action]).to eq(action.to_s)
@@ -25,6 +25,49 @@ RSpec.describe Umgr::Runner do
         expect(result[:ok]).to eq(false)
         expect(result[:state_path]).to end_with('/.umgr/state.json')
       end
+    end
+  end
+
+  it 'returns a planned changeset for desired vs current state' do
+    Dir.mktmpdir do |tmp_dir|
+      backend = Umgr::StateBackend.new(root_dir: tmp_dir)
+      backend.write(
+        version: 1,
+        resources: [
+          { provider: 'echo', type: 'user', name: 'alice', attributes: { team: 'infra' } },
+          { provider: 'echo', type: 'user', name: 'bob' }
+        ]
+      )
+      local_runner = described_class.new(state_backend: backend)
+      File.write(
+        File.join(tmp_dir, 'users.yml'),
+        <<~YAML
+          version: 1
+          resources:
+            - provider: echo
+              type: user
+              name: alice
+              attributes:
+                team: platform
+            - provider: echo
+              type: user
+              name: carla
+        YAML
+      )
+
+      result = Dir.chdir(tmp_dir) { local_runner.dispatch(:plan, config: 'users.yml') }
+      changes = result.fetch(:changeset).fetch(:changes)
+
+      expect(result[:ok]).to eq(true)
+      expect(result[:status]).to eq('planned')
+      expect(changes.map { |change| [change[:identity], change[:action]] }).to eq(
+        [
+          ['echo.user.alice', 'update'],
+          ['echo.user.bob', 'delete'],
+          ['echo.user.carla', 'create']
+        ]
+      )
+      expect(result.fetch(:changeset).fetch(:summary)).to eq(create: 1, update: 1, delete: 1, no_change: 0)
     end
   end
 
