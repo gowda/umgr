@@ -34,7 +34,7 @@ Providers are managed by [`Umgr::ProviderRegistry`](../lib/umgr/provider_registr
 
 - Register with `register(name, provider_instance)`.
 - `name` is normalized to a symbol (for example, `"echo"` -> `:echo`).
-- Empty provider names raise `Umgr::Errors::ValidationError`.
+- Empty provider names raise `Umgr::Errors::ProviderContractError`.
 
 `umgr` includes one built-in test provider:
 
