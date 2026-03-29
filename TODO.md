@@ -7,7 +7,7 @@
     - [x] Pre-commit checks waived by user exception (2026-03-28)
     - [x] Commit created
 
-- [ ] Phase 1: Foundation + Shared Runtime
+- [x] Phase 1: Foundation + Shared Runtime
   - [x] Task 1.1: Scaffold gem, executable, Thor CLI wiring, RSpec/Aruba setup, RuboCop + rubocop-performance config
     - [x] CLI verification (Aruba)
     - [x] Library verification (RSpec)
@@ -91,7 +91,7 @@
     - [x] Pre-commit checks passed (rubocop + rspec + aruba)
     - [x] Commit created
 
-- [ ] Phase 5: Provider Authoring Documentation
+- [x] Phase 5: Provider Authoring Documentation
   - [x] Task 5.1: Add detailed provider/plugin authoring guide in separate markdown file after first provider implementation
     - [x] CLI verification (Aruba)
     - [x] Library verification (RSpec)
@@ -103,7 +103,7 @@
     - [x] Pre-commit checks passed (rubocop + rspec + aruba)
     - [x] Commit created
 
-- [ ] Phase 6: Planning Engine
+- [x] Phase 6: Planning Engine
   - [x] Task 6.1: Implement canonical resource identity (provider.type.name)
     - [x] CLI verification (Aruba)
     - [x] Library verification (RSpec)
@@ -125,7 +125,7 @@
     - [x] Pre-commit checks passed (rubocop + rspec + aruba)
     - [x] Commit created
 
-- [ ] Phase 7: First Concrete Provider (GitHub)
+- [x] Phase 7: First Concrete Provider (GitHub)
   - [x] Task 7.1: Implement GitHub provider scaffold and registration
     - [x] Add `github` provider class with contract methods (validate/current/plan/apply)
     - [x] Add provider-specific configuration contract (org, auth token/env, team mapping inputs)
@@ -156,11 +156,11 @@
     - [x] Commit created
 
 - [ ] Phase 8: Apply Engine
-  - [ ] Task 8.1: Implement apply execution and state persistence
-    - [ ] CLI verification (Aruba)
-    - [ ] Library verification (RSpec)
-    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [ ] Commit created
+  - [x] Task 8.1: Implement apply execution and state persistence
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
   - [ ] Task 8.2: Implement idempotency checks (apply then plan yields no changes)
     - [ ] CLI verification (Aruba)
     - [ ] Library verification (RSpec)
