@@ -2,17 +2,16 @@
 
 module Umgr
   class Runner
+    include RunnerConfig
+
     ACTIONS = %i[init validate plan apply show import].freeze
-    AUTO_DISCOVERY_CONFIGS = %w[umgr.yml umgr.yaml umgr.json].freeze
 
     def initialize(state_backend: nil, provider_registry: nil)
       @state_backend = state_backend || StateBackend.new
       @provider_registry = provider_registry || ProviderRegistry.new
     end
 
-    def ping
-      :ok
-    end
+    def ping = :ok
 
     # rubocop:disable Style/ArgumentsForwarding
     def dispatch(action, **options)
@@ -27,10 +26,12 @@ module Umgr
 
     def init(**options)
       existing_state = state_backend.read
-      return completed(:init, 'already_initialized', options, existing_state) if existing_state
-
-      state_backend.write(StateTemplate::INITIAL_STATE)
-      completed(:init, 'initialized', options, StateTemplate::INITIAL_STATE)
+      if existing_state
+        completed(:init, 'already_initialized', options, existing_state)
+      else
+        state_backend.write(StateTemplate::INITIAL_STATE)
+        completed(:init, 'initialized', options, StateTemplate::INITIAL_STATE)
+      end
     end
 
     def validate(**options)
@@ -49,14 +50,16 @@ module Umgr
 
     def apply(**options)
       resolved_options = with_resolved_config(:apply, options)
-      not_implemented(:apply, resolved_options)
+      ApplyResultBuilder.call(
+        state_backend: state_backend,
+        options: resolved_options,
+        provider_registry: provider_registry
+      )
     end
 
     def show(**options)
       state = state_backend.read
-      return completed(:show, 'ok', options, state) if state
-
-      completed(:show, 'not_initialized', options, nil)
+      completed(:show, state ? 'ok' : 'not_initialized', options, state)
     end
 
     def import(**options)
@@ -83,49 +86,6 @@ module Umgr
         state_path: state_backend.path,
         state: state
       }
-    end
-
-    def with_resolved_config(action, options)
-      resolved_options = options.dup
-      resolved = resolve_config_path(options[:config])
-      return with_validated_config_options(action, resolved_options, resolved) if resolved
-
-      supported = AUTO_DISCOVERY_CONFIGS.join(', ')
-      raise Errors::ValidationError, "`config` is required for #{action}. Auto-discovery checks: #{supported}"
-    end
-
-    def with_validated_config_options(action, resolved_options, resolved)
-      desired_state = ensure_valid_config(resolved)
-      UnknownProviderGuard.validate!(desired_state: desired_state, action: action, provider_registry: provider_registry)
-      ProviderResourceValidator.validate!(desired_state: desired_state, provider_registry: provider_registry)
-      resolved_options.merge(config: resolved, desired_state: desired_state)
-    end
-
-    def resolve_config_path(config_path)
-      return explicit_config_path(config_path) if config_path && !config_path.empty?
-
-      discover_config_path
-    end
-
-    def explicit_config_path(config_path)
-      absolute_path = File.expand_path(config_path)
-      return absolute_path if File.file?(absolute_path)
-
-      raise Errors::ValidationError, "Config file not found: #{config_path}"
-    end
-
-    def discover_config_path
-      AUTO_DISCOVERY_CONFIGS.each do |candidate|
-        absolute_path = File.expand_path(candidate)
-        return absolute_path if File.file?(absolute_path)
-      end
-
-      nil
-    end
-
-    def ensure_valid_config(config_path)
-      desired_state = DeepSymbolizer.call(ConfigValidator.validated_config(config_path))
-      DesiredStateEnricher.call(desired_state)
     end
 
     attr_reader :state_backend, :provider_registry

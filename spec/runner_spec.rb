@@ -17,7 +17,7 @@ RSpec.describe Umgr::Runner do
     Dir.mktmpdir do |tmp_dir|
       File.write(File.join(tmp_dir, 'users.yml'), "version: 1\nresources: []\n")
 
-      %i[validate apply import].each do |action|
+      %i[validate import].each do |action|
         result = Dir.chdir(tmp_dir) { runner.dispatch(action, config: 'users.yml') }
 
         expect(result[:action]).to eq(action.to_s)
@@ -25,6 +25,40 @@ RSpec.describe Umgr::Runner do
         expect(result[:ok]).to eq(false)
         expect(result[:state_path]).to end_with('/.umgr/state.json')
       end
+    end
+  end
+
+  it 'applies desired state and persists resulting state' do
+    Dir.mktmpdir do |tmp_dir|
+      backend = Umgr::StateBackend.new(root_dir: tmp_dir)
+      backend.write(
+        version: 1,
+        resources: [{ provider: 'echo', type: 'user', name: 'alice', attributes: { team: 'infra' } }]
+      )
+      local_runner = described_class.new(state_backend: backend)
+      File.write(
+        File.join(tmp_dir, 'users.yml'),
+        <<~YAML
+          version: 1
+          resources:
+            - provider: echo
+              type: user
+              name: alice
+              attributes:
+                team: platform
+            - provider: echo
+              type: user
+              name: carla
+        YAML
+      )
+
+      result = Dir.chdir(tmp_dir) { local_runner.dispatch(:apply, config: 'users.yml') }
+
+      expect(result[:ok]).to eq(true)
+      expect(result[:status]).to eq('applied')
+      expect(result.fetch(:changeset).fetch(:summary)).to eq(create: 1, update: 1, delete: 0, no_change: 0)
+      expect(result.fetch(:apply_results).map { |item| item[:status] }).to eq(%w[applied applied])
+      expect(backend.read).to eq(result.fetch(:state))
     end
   end
 

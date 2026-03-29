@@ -147,13 +147,13 @@
     - [x] Library verification (RSpec)
     - [x] Pre-commit checks passed (rubocop + rspec + aruba)
     - [x] Commit created
-  - [ ] Task 7.4: Implement GitHub apply execution for membership reconciliation
-    - [ ] Apply org invitations and team membership updates safely
-    - [ ] Persist resulting state and preserve idempotency guarantees
-    - [ ] CLI verification (Aruba)
-    - [ ] Library verification (RSpec)
-    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [ ] Commit created
+  - [x] Task 7.4: Implement GitHub apply execution for membership reconciliation
+    - [x] Apply org invitations and team membership updates safely
+    - [x] Persist resulting state and preserve idempotency guarantees
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
 
 - [ ] Phase 8: Apply Engine
   - [ ] Task 8.1: Implement apply execution and state persistence
@@ -179,6 +179,13 @@
 
 - [ ] Phase 9: Hardening + Docs Consistency
   - [ ] Task 9.1: Add end-to-end workflow coverage (init -> validate -> plan -> apply -> show)
+    - [ ] CLI verification (Aruba)
+    - [ ] Library verification (RSpec)
+    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [ ] Commit created
+  - [ ] Task 9.1a: Re-enable `rubocop-rspec` cops and align test suite with enforced guidelines
+    - [ ] Burn down and remove temporary `rubocop-rspec` suppressions from `.rubocop_todo.yml`
+    - [ ] Refactor specs to satisfy the re-enabled cops without reducing coverage quality
     - [ ] CLI verification (Aruba)
     - [ ] Library verification (RSpec)
     - [ ] Pre-commit checks passed (rubocop + rspec + aruba)

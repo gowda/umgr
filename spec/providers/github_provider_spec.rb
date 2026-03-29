@@ -217,10 +217,52 @@ RSpec.describe Umgr::Providers::GithubProvider do
     expect(result.fetch(:operations)).to eq([{ type: 'remove_org_member', login: 'alice' }])
   end
 
-  it 'returns not_implemented status for apply' do
-    result = provider.apply(changeset: { action: 'create' })
+  it 'applies invite and team membership operations from provider plan' do
+    stub_request(:put, 'https://api.github.com/orgs/acme/memberships/alice')
+      .to_return(status: 200, body: JSON.generate(state: 'pending'), headers: { 'Content-Type' => 'application/json' })
+    stub_request(:get, %r{\Ahttps://api\.github\.com/orgs/acme/teams(\?.*)?\z}).to_return(
+      status: 200,
+      body: JSON.generate([{ id: 101, slug: 'platform' }]),
+      headers: { 'Content-Type' => 'application/json' }
+    )
+    stub_request(:put, 'https://api.github.com/teams/101/memberships/alice').to_return(
+      status: 200,
+      body: JSON.generate(state: 'active'),
+      headers: { 'Content-Type' => 'application/json' }
+    )
 
-    expect(result[:ok]).to eq(false)
-    expect(result[:status]).to eq('not_implemented')
+    changeset = {
+      action: 'create',
+      desired: {
+        provider: 'github',
+        type: 'user',
+        name: 'alice',
+        org: 'acme',
+        token: 'secret'
+      },
+      current: nil,
+      provider_plan: {
+        operations: [
+          { type: 'invite_org_member', login: 'alice' },
+          { type: 'add_team_membership', login: 'alice', team: 'platform' }
+        ]
+      }
+    }
+
+    result = provider.apply(changeset: changeset)
+
+    expect(result).to include(ok: true, provider: 'github', status: 'applied')
+    expect(result.fetch(:executed_operations)).to eq(changeset[:provider_plan][:operations])
+  end
+
+  it 'raises for unsupported apply operations' do
+    expect do
+      provider.apply(
+        changeset: {
+          desired: { provider: 'github', type: 'user', name: 'alice', org: 'acme', token: 'secret' },
+          provider_plan: { operations: [{ type: 'mystery', login: 'alice' }] }
+        }
+      )
+    end.to raise_error(Umgr::Errors::InternalError, /Unsupported GitHub apply operation/)
   end
 end
