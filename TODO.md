@@ -170,7 +170,7 @@
   - [x] Task 12.4: Docs and examples migration
     - [x] Update README + DSL docs to assignment-only syntax
     - [x] Add exhaustive configuration examples in all supported formats: `umgr.rb`, `umgr.yml`/`umgr.yaml`, and `umgr.json`
-    - [x] Add migration notes and error examples
+    - [x] Add error examples
     - [x] CLI verification (Aruba)
     - [x] Library verification (RSpec)
     - [x] Pre-commit checks passed (rubocop + rspec + aruba)

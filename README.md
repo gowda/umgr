@@ -97,7 +97,7 @@ umgr compile | umgr apply --config -
 ```
 
 Exhaustive configuration examples for `umgr.rb`, `umgr.yml`/`umgr.yaml`, and
-`umgr.json`, plus migration/error notes:
+`umgr.json`, plus error notes:
 [`docs/dsl-compile.md`](docs/dsl-compile.md)
 
 ## Ruby API Example

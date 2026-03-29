@@ -127,28 +127,6 @@ Resolution options:
 If only `umgr.rb` exists (and no static config is auto-discovered), runtime
 commands fail with a compile-first error and include the pipeline hint.
 
-## Migration Notes
-
-### Old syntax to remove
-
-```ruby
-umgr do
-  version 1
-end
-
-resource provider: "echo", type: "user", name: "alice"
-```
-
-### New syntax
-
-```ruby
-umgr do
-  version = 1
-end
-
-resource "echo.user", "alice"
-```
-
 ## Error Examples
 
 - Missing top-level `umgr` block:
