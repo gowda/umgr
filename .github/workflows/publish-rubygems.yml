@@ -20,6 +20,7 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.4"
+          bundler-cache: true
       - name: "Guard: stable tags only for public release"
         env:
           RELEASE_TAG: ${{ github.event.release.tag_name }}
