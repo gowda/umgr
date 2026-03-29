@@ -1,5 +1,10 @@
 # frozen_string_literal: true
 
+require_relative 'github/api_client'
+require_relative 'github/apply_executor'
+require_relative 'github/account_normalizer'
+require_relative 'github/plan_builder'
+
 module Umgr
   module Providers
     class GithubProvider < Provider
