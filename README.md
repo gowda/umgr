@@ -138,9 +138,10 @@ Configure Bundler authentication for GitHub Packages:
 bundle config set --global rubygems.pkg.github.com "<GITHUB_USERNAME>:<YOUR_GITHUB_TOKEN>"
 ```
 
-## Public RubyGems Release Path (OIDC)
+## Public RubyGems Publishing (OIDC)
 
-Public RubyGems publishing is gated behind OIDC trusted publishing readiness.
+Stable releases are published to RubyGems via OIDC trusted publishing.
 
+- Public gem: `https://rubygems.org/gems/umgr`
 - Workflow: `.github/workflows/publish-rubygems.yml`
-- Readiness + promotion doc: [`docs/release-rubygems-oidc.md`](docs/release-rubygems-oidc.md)
+- Publishing details: [`docs/release-rubygems.md`](docs/release-rubygems.md)
