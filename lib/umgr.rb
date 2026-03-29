@@ -3,6 +3,7 @@
 require_relative 'umgr/version'
 require_relative 'umgr/errors'
 require_relative 'umgr/config_validator'
+require_relative 'umgr/dsl_compiler'
 require_relative 'umgr/deep_symbolizer'
 require_relative 'umgr/resource_identity'
 require_relative 'umgr/desired_state_enricher'

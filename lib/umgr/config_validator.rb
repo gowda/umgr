@@ -12,12 +12,23 @@ module Umgr
       new(config_path).validated_config
     end
 
+    def self.validated_content(content, source: 'stdin')
+      new(source, content: content, parse_mode: :auto).validated_config
+    end
+
+    def self.validated_data(data, source:)
+      new(source, parsed_data: data).validated_config
+    end
+
     def self.validate!(config_path)
       new(config_path).validate!
     end
 
-    def initialize(config_path)
+    def initialize(config_path, content: nil, parse_mode: nil, parsed_data: nil)
       @config_path = config_path
+      @content = content
+      @parse_mode = parse_mode
+      @parsed_data = parsed_data
     end
 
     def validated_config
@@ -34,13 +45,41 @@ module Umgr
 
     private
 
-    attr_reader :config_path
+    attr_reader :config_path, :content, :parse_mode, :parsed_data
 
     def parse
-      content = File.read(config_path)
-      parse_by_extension(content)
+      return parsed_data if parsed_data
+
+      raw_content = content || File.read(config_path)
+      parse_content(raw_content)
     rescue JSON::ParserError, Psych::SyntaxError => e
       raise Errors::ValidationError, "Config parse error in #{config_path}: #{e.message}"
+    end
+
+    def parse_content(content)
+      parser_mode = parse_mode || extension_parse_mode
+      return parse_by_extension(content) unless parser_mode == :auto
+
+      parse_auto(content)
+    end
+
+    def parse_auto(content)
+      JSON.parse(content)
+    rescue JSON::ParserError
+      YAML.safe_load(content, aliases: false)
+    rescue Psych::SyntaxError => e
+      raise Errors::ValidationError, "Config parse error in #{config_path}: #{e.message}"
+    end
+
+    def extension_parse_mode
+      case File.extname(config_path).downcase
+      when '.json'
+        :json
+      when '.yml', '.yaml'
+        :yaml
+      else
+        :unsupported
+      end
     end
 
     def parse_by_extension(content)

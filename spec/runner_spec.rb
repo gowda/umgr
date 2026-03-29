@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'tmpdir'
+require 'stringio'
 
 RSpec.describe Umgr::Runner do
   subject(:runner) { described_class.new }
@@ -383,6 +384,39 @@ RSpec.describe Umgr::Runner do
     end
   end
 
+  it 'compiles DSL into validated config' do
+    Dir.mktmpdir do |tmp_dir|
+      File.write(
+        File.join(tmp_dir, 'umgr.rb'),
+        <<~RUBY
+          umgr do
+            version 1
+            resource provider: 'echo', type: 'user', name: 'alice', attributes: { team: 'platform' }
+          end
+        RUBY
+      )
+
+      result = Dir.chdir(tmp_dir) { runner.dispatch(:compile) }
+
+      expect(result[:ok]).to be(true)
+      expect(result[:status]).to eq('compiled')
+      expect(result[:options][:dsl]).to end_with('/umgr.rb')
+      expect(result[:config]).to eq(
+        {
+          'version' => 1,
+          'resources' => [
+            {
+              'provider' => 'echo',
+              'type' => 'user',
+              'name' => 'alice',
+              'attributes' => { 'team' => 'platform' }
+            }
+          ]
+        }
+      )
+    end
+  end
+
   it 'auto-discovers config when not explicitly provided' do
     Dir.mktmpdir do |tmp_dir|
       config_path = File.join(tmp_dir, 'umgr.yml')
@@ -394,6 +428,22 @@ RSpec.describe Umgr::Runner do
     end
   end
 
+  it 'reads config from stdin when --config - is used' do
+    input = StringIO.new(
+      "{\"version\":1,\"resources\":[{\"provider\":\"echo\",\"type\":\"user\",\"name\":\"alice\"}]}\n"
+    )
+    original_stdin = $stdin
+    $stdin = input
+
+    result = runner.dispatch(:validate, config: '-')
+
+    expect(result[:options][:config]).to eq('-')
+    identity = result.fetch(:options).fetch(:desired_state).fetch(:resources).first.fetch(:identity)
+    expect(identity).to eq('echo.user.alice')
+  ensure
+    $stdin = original_stdin
+  end
+
   it 'uses explicit config path over auto-discovery candidates' do
     Dir.mktmpdir do |tmp_dir|
       File.write(File.join(tmp_dir, 'umgr.yml'), "version: 1\nresources: []\n")
@@ -403,6 +453,17 @@ RSpec.describe Umgr::Runner do
       result = Dir.chdir(tmp_dir) { runner.dispatch(:validate, config: 'custom.json') }
 
       expect(result[:options][:config]).to end_with('/custom.json')
+    end
+  end
+
+  it 'raises validation error on auto-discovery ambiguity between DSL and static config' do
+    Dir.mktmpdir do |tmp_dir|
+      File.write(File.join(tmp_dir, 'umgr.rb'), "umgr do\n  version 1\nend\n")
+      File.write(File.join(tmp_dir, 'umgr.yml'), "version: 1\nresources: []\n")
+
+      expect do
+        Dir.chdir(tmp_dir) { runner.dispatch(:validate) }
+      end.to raise_error(Umgr::Errors::ValidationError, /Auto-discovery ambiguity/)
     end
   end
 
