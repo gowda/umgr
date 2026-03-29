@@ -25,6 +25,16 @@ Validation failure contract for `validate(resource:)`:
 - Also supported: return a hash with `ok: false` (or `"ok" => false`), which
   `umgr` promotes to `Umgr::Errors::ValidationError`.
 
+`current(resource:)` return contract (used by `import`):
+
+- Recommended: return `{ ok: true, imported_accounts: [resource_hash, ...] }`.
+- Also supported:
+  - `{ ok: true, resource: resource_hash }`
+  - `{ ok: true, account: account_hash }` where `account` must be a hash and is
+    mapped into `attributes`.
+- Return `{ ok: false, error: "..." }` (or string-key equivalent) to surface
+  provider fetch/import failures.
+
 ## Contract Enforcement
 
 Registration is validated by [`Umgr::ProviderContract`](../lib/umgr/provider_contract.rb):
@@ -73,6 +83,9 @@ For `validate`, `plan`, `apply`, and `import` actions:
 3. Unknown providers are rejected early (`UnknownProviderGuard`).
 4. Action execution uses provider(s) from the registry.
 
+For import specifically, `Runner#import` persists imported resources into
+managed state and returns `{ status: "imported", imported_count: N }`.
+
 ## Minimal Provider Example
 
 ```ruby
@@ -90,7 +103,7 @@ module Umgr
       def current(resource:)
         # fetch current account from Acme API
         account = { email: resource.dig(:attributes, :email) }
-        { ok: true, provider: 'acme', account: account, resource: resource }
+        { ok: true, provider: 'acme', account: account }
       end
 
       def plan(desired:, current:)

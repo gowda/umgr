@@ -109,11 +109,11 @@
     - [x] Library verification (RSpec)
     - [x] Pre-commit checks passed (rubocop + rspec + aruba)
     - [x] Commit created
-  - [ ] Task 9.2: Run README/provider-doc consistency pass and fix mismatches
-    - [ ] CLI verification (Aruba)
-    - [ ] Library verification (RSpec)
-    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [ ] Commit created
+  - [x] Task 9.2: Run README/provider-doc consistency pass and fix mismatches
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
   - [ ] Task 9.3: Final stabilization with all checks green
     - [ ] CLI verification (Aruba)
     - [ ] Library verification (RSpec)
