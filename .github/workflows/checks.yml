@@ -45,7 +45,7 @@ jobs:
         run: ruby scripts/ci/coverage_summary.rb coverage/.last_run.json
       - name: Upload coverage artifact (library)
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: coverage-library
           path: coverage/
@@ -72,7 +72,7 @@ jobs:
         run: ruby scripts/ci/coverage_summary.rb coverage/.last_run.json
       - name: Upload coverage artifact (cli)
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: coverage-cli
           path: coverage/
