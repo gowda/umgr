@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-RSpec.describe Umgr::Providers::GithubProvider do
-  subject(:provider) { described_class.new(api_client: api_client) }
+require 'json'
 
-  let(:api_client) { instance_double(Umgr::Providers::GithubApiClient) }
+RSpec.describe Umgr::Providers::GithubProvider do
+  subject(:provider) { described_class.new }
 
   let(:resource) do
     {
@@ -46,19 +46,35 @@ RSpec.describe Umgr::Providers::GithubProvider do
   end
 
   it 'imports current users and team memberships into canonical resources' do
-    allow(api_client).to receive(:list_org_users).with(org: 'acme', token: 'secret').and_return(
-      [
-        {
-          'id' => 10,
-          'login' => 'alice',
-          'avatar_url' => 'https://avatars.example/alice',
-          'html_url' => 'https://github.com/alice',
-          'type' => 'User'
-        }
-      ]
+    stub_request(:get, 'https://api.github.com/orgs/acme/members').to_return(
+      status: 200,
+      body: JSON.generate(
+        [
+          {
+            id: 10,
+            login: 'alice',
+            avatar_url: 'https://avatars.example/alice',
+            html_url: 'https://github.com/alice',
+            type: 'User'
+          }
+        ]
+      ),
+      headers: { 'Content-Type' => 'application/json' }
     )
-    allow(api_client).to receive(:list_org_team_memberships).with(org: 'acme', token: 'secret').and_return(
-      { 'alice' => %w[platform admins] }
+    stub_request(:get, 'https://api.github.com/orgs/acme/teams').to_return(
+      status: 200,
+      body: JSON.generate([{ slug: 'platform' }, { slug: 'admins' }]),
+      headers: { 'Content-Type' => 'application/json' }
+    )
+    stub_request(:get, 'https://api.github.com/orgs/acme/teams/platform/members').to_return(
+      status: 200,
+      body: JSON.generate([{ login: 'alice' }]),
+      headers: { 'Content-Type' => 'application/json' }
+    )
+    stub_request(:get, 'https://api.github.com/orgs/acme/teams/admins/members').to_return(
+      status: 200,
+      body: JSON.generate([{ login: 'alice' }]),
+      headers: { 'Content-Type' => 'application/json' }
     )
 
     result = provider.current(resource: resource.merge(token: 'secret'))
@@ -88,10 +104,29 @@ RSpec.describe Umgr::Providers::GithubProvider do
     )
   end
 
+  it 'raises api error when github api fails' do
+    stub_request(:get, 'https://api.github.com/orgs/acme/members').to_return(
+      status: 401,
+      body: JSON.generate(message: 'Bad credentials'),
+      headers: { 'Content-Type' => 'application/json' }
+    )
+
+    expect { provider.current(resource: resource.merge(token: 'secret')) }
+      .to raise_error(Umgr::Errors::ApiError, /GitHub API request failed/)
+  end
+
   it 'uses token_env when token is not provided' do
     allow(ENV).to receive(:fetch).with('GITHUB_TOKEN', nil).and_return('from-env')
-    allow(api_client).to receive(:list_org_users).with(org: 'acme', token: 'from-env').and_return([])
-    allow(api_client).to receive(:list_org_team_memberships).with(org: 'acme', token: 'from-env').and_return({})
+    stub_request(:get, 'https://api.github.com/orgs/acme/members').to_return(
+      status: 200,
+      body: JSON.generate([]),
+      headers: { 'Content-Type' => 'application/json' }
+    )
+    stub_request(:get, 'https://api.github.com/orgs/acme/teams').to_return(
+      status: 200,
+      body: JSON.generate([]),
+      headers: { 'Content-Type' => 'application/json' }
+    )
 
     result = provider.current(resource: resource)
 

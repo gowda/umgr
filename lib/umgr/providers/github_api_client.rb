@@ -79,12 +79,22 @@ module Umgr
       def parse_next_url(link_header)
         return nil unless link_header
 
-        links = link_header.split(',').map(&:strip)
+        header_value = normalize_header_value(link_header)
+        return nil unless header_value
+
+        links = header_value.split(',').map(&:strip)
         next_entry = links.find { |entry| entry.end_with?('rel="next"') }
         return nil unless next_entry
 
         raw_url = next_entry[/<([^>]+)>/, 1]
         raw_url ? URI.parse(raw_url) : nil
+      end
+
+      def normalize_header_value(value)
+        return value.first if value.is_a?(Array)
+        return value if value.is_a?(String)
+
+        nil
       end
 
       def append_team_memberships!(team_memberships:, org:, token:, team:)
