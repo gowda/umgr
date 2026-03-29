@@ -193,3 +193,36 @@
     - [ ] Library verification (RSpec)
     - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
     - [ ] Commit created
+
+- [ ] Phase 10: Release + Distribution
+  - [ ] Task 10.1: Add private publish workflow for GitHub Packages triggered by GitHub Release publish event
+    - [ ] Use `on: release` with `types: [published]`
+    - [ ] Configure publish auth using `GITHUB_TOKEN` with required package permissions
+    - [ ] CLI verification (Aruba)
+    - [ ] Library verification (RSpec)
+    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [ ] Commit created
+  - [ ] Task 10.2: Enforce progressive SemVer validation in release workflow before publish
+    - [ ] Validate release tag format and match against gem version
+    - [ ] Ensure new release version is strictly greater than previously published registry version
+    - [ ] Fail workflow on SemVer or monotonic-version violations
+    - [ ] CLI verification (Aruba)
+    - [ ] Library verification (RSpec)
+    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [ ] Commit created
+  - [ ] Task 10.3: Document private installation and Gemfile usage for GitHub Packages in README.md
+    - [ ] Add `gem install` instructions for private GitHub Packages consumption
+    - [ ] Add Gemfile `source` + authentication setup for private package usage
+    - [ ] Document consumer credential requirements for private installs
+    - [ ] CLI verification (Aruba)
+    - [ ] Library verification (RSpec)
+    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [ ] Commit created
+  - [ ] Task 10.4: Add public RubyGems publish readiness plan using OIDC trusted publishing (no long-lived API key secrets)
+    - [ ] Define release-triggered workflow gates for RubyGems publish
+    - [ ] Configure OIDC permissions (`id-token: write`) and trusted publishing prerequisites
+    - [ ] Document promotion path from private prerelease to public stable release
+    - [ ] CLI verification (Aruba)
+    - [ ] Library verification (RSpec)
+    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [ ] Commit created
