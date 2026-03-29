@@ -67,8 +67,6 @@ module Umgr
       JSON.parse(content)
     rescue JSON::ParserError
       YAML.safe_load(content, aliases: false)
-    rescue Psych::SyntaxError => e
-      raise Errors::ValidationError, "Config parse error in #{config_path}: #{e.message}"
     end
 
     def extension_parse_mode

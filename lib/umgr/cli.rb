@@ -5,7 +5,6 @@ require 'thor'
 require 'yaml'
 
 module Umgr
-  # rubocop:disable Metrics/ClassLength
   class CLI < Thor
     desc 'version', 'Print umgr version'
     def version
@@ -139,5 +138,4 @@ module Umgr
       YAML.dump(config)
     end
   end
-  # rubocop:enable Metrics/ClassLength
 end

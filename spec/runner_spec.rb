@@ -472,6 +472,16 @@ RSpec.describe Umgr::Runner do
       .to raise_error(Umgr::Errors::ValidationError, /config/)
   end
 
+  it 'raises validation error when only DSL source is present' do
+    Dir.mktmpdir do |tmp_dir|
+      File.write(File.join(tmp_dir, 'umgr.rb'), "umgr do\n  version 1\nend\n")
+
+      expect do
+        Dir.chdir(tmp_dir) { runner.dispatch(:validate) }
+      end.to raise_error(Umgr::Errors::ValidationError, /compile first/)
+    end
+  end
+
   it 'raises validation error when explicit config is missing' do
     expect { runner.dispatch(:validate, config: 'does-not-exist.yml') }
       .to raise_error(Umgr::Errors::ValidationError, /Config file not found/)
