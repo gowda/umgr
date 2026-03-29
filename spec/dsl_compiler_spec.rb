@@ -288,4 +288,24 @@ RSpec.describe Umgr::DslCompiler do
       end.to raise_error(Umgr::Errors::ValidationError, /Legacy resource syntax/)
     end
   end
+
+  it 'raises validation error when resources item is missing required keys' do
+    Dir.mktmpdir do |tmp_dir|
+      dsl_path = File.join(tmp_dir, 'umgr.rb')
+      File.write(
+        dsl_path,
+        <<~RUBY
+          umgr do
+            version = 1
+          end
+
+          resources([{ provider: 'echo', name: 'alice' }])
+        RUBY
+      )
+
+      expect do
+        described_class.compile_file(dsl_path)
+      end.to raise_error(Umgr::Errors::ValidationError, /resources\(\.\.\.\) item is missing required key\(s\): type/)
+    end
+  end
 end

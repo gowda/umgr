@@ -147,6 +147,19 @@ module Umgr
       end
     end
 
+    class ResourceItemValidator
+      def call(item)
+        required = %w[provider type name]
+        missing = required.reject { |key| item.key?(key) }
+        return if missing.empty?
+
+        ::Kernel.raise(
+          ::Umgr::Errors::ValidationError,
+          "resources(...) item is missing required key(s): #{missing.join(', ')}"
+        )
+      end
+    end
+
     class Context < BasicObject
       def initialize(source:)
         @builder = Builder.new
@@ -155,6 +168,7 @@ module Umgr
         @assignment_parser = UmgrAssignmentParser.new(source.lines)
         @resource_reference_parser = ResourceReferenceParser.new
         @account_entry_normalizer = AccountEntryNormalizer.new
+        @resource_item_validator = ResourceItemValidator.new
       end
 
       def umgr(&)
@@ -197,6 +211,7 @@ module Umgr
       def resources(items)
         items.each do |item|
           normalized = item.transform_keys(&:to_s)
+          @resource_item_validator.call(normalized)
           resource(
             "#{normalized.fetch('provider')}.#{normalized.fetch('type')}",
             normalized.fetch('name'),
