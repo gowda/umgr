@@ -19,6 +19,10 @@ RSpec.describe Umgr::ProviderRegistry do
     expect(registry.fetch(:echo)).to be_a(Umgr::Providers::EchoProvider)
   end
 
+  it 'registers built-in github provider by default' do
+    expect(registry.fetch(:github)).to be_a(Umgr::Providers::GithubProvider)
+  end
+
   it 'lists registered provider names' do
     registry.register(:slack, provider)
     registry.register('github', provider)

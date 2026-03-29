@@ -265,7 +265,7 @@ RSpec.describe Umgr::Runner do
         <<~YAML
           version: 1
           resources:
-            - provider: github
+            - provider: atlassian
               type: user
               name: alice
         YAML
@@ -274,8 +274,28 @@ RSpec.describe Umgr::Runner do
       %i[validate plan apply import].each do |action|
         expect do
           Dir.chdir(tmp_dir) { runner.dispatch(action, config: 'users.yml') }
-        end.to raise_error(Umgr::Errors::ValidationError, /Unknown provider\(s\) for #{action}: github/)
+        end.to raise_error(Umgr::Errors::ValidationError, /Unknown provider\(s\) for #{action}: atlassian/)
       end
+    end
+  end
+
+  it 'raises validation error for invalid github provider configuration' do
+    Dir.mktmpdir do |tmp_dir|
+      File.write(
+        File.join(tmp_dir, 'users.yml'),
+        <<~YAML
+          version: 1
+          resources:
+            - provider: github
+              type: user
+              name: alice
+              token_env: GITHUB_TOKEN
+        YAML
+      )
+
+      expect do
+        Dir.chdir(tmp_dir) { runner.dispatch(:validate, config: 'users.yml') }
+      end.to raise_error(Umgr::Errors::ValidationError, /requires non-empty `org`/)
     end
   end
 

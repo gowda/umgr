@@ -126,13 +126,13 @@
     - [x] Commit created
 
 - [ ] Phase 7: First Concrete Provider (GitHub)
-  - [ ] Task 7.1: Implement GitHub provider scaffold and registration
-    - [ ] Add `github` provider class with contract methods (validate/current/plan/apply)
-    - [ ] Add provider-specific configuration contract (org, auth token/env, team mapping inputs)
-    - [ ] CLI verification (Aruba)
-    - [ ] Library verification (RSpec)
-    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [ ] Commit created
+  - [x] Task 7.1: Implement GitHub provider scaffold and registration
+    - [x] Add `github` provider class with contract methods (validate/current/plan/apply)
+    - [x] Add provider-specific configuration contract (org, auth token/env, team mapping inputs)
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
   - [ ] Task 7.2: Implement GitHub import/current state retrieval
     - [ ] Import org users and team membership snapshots through GitHub API
     - [ ] Normalize imported state into canonical identities (`github.user.<login>`)
