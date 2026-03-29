@@ -37,4 +37,16 @@ RSpec.describe Umgr::StateBackend do
       expect(temp_files).to eq([])
     end
   end
+
+  it 'deletes persisted state file' do
+    Dir.mktmpdir do |tmp_dir|
+      backend = described_class.new(root_dir: tmp_dir)
+      backend.write(version: 1, resources: [])
+
+      backend.delete
+
+      expect(File.file?(backend.path)).to eq(false)
+      expect(backend.read).to eq(nil)
+    end
+  end
 end

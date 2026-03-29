@@ -67,6 +67,56 @@ RSpec.describe Umgr::Runner do
     end
   end
 
+  it 'keeps existing state unchanged when apply fails' do
+    failing_provider = Class.new do
+      def validate(resource:)
+        { ok: true, resource: resource }
+      end
+
+      def current(resource:)
+        { ok: true, account: resource }
+      end
+
+      def plan(desired:, current:)
+        { ok: true, provider: 'failing', status: desired == current ? 'no_change' : 'planned' }
+      end
+
+      def apply(changeset:)
+        { ok: false, provider: 'failing', error: "cannot apply #{changeset.fetch(:identity)}" }
+      end
+    end.new
+
+    Dir.mktmpdir do |tmp_dir|
+      backend = Umgr::StateBackend.new(root_dir: tmp_dir)
+      backend.write(
+        version: 1,
+        resources: [{ provider: 'failing', type: 'user', name: 'alice', attributes: { team: 'infra' } }]
+      )
+      before_apply_state = backend.read
+      registry = Umgr::ProviderRegistry.new
+      registry.register('failing', failing_provider)
+      local_runner = described_class.new(state_backend: backend, provider_registry: registry)
+
+      File.write(
+        File.join(tmp_dir, 'users.yml'),
+        <<~YAML
+          version: 1
+          resources:
+            - provider: failing
+              type: user
+              name: alice
+              attributes:
+                team: platform
+        YAML
+      )
+
+      expect do
+        Dir.chdir(tmp_dir) { local_runner.dispatch(:apply, config: 'users.yml') }
+      end.to raise_error(Umgr::Errors::InternalError, /Provider apply failed/)
+      expect(backend.read).to eq(before_apply_state)
+    end
+  end
+
   it 'is idempotent when plan is run after apply' do
     Dir.mktmpdir do |tmp_dir|
       backend = Umgr::StateBackend.new(root_dir: tmp_dir)

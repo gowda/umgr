@@ -278,11 +278,15 @@
     - [x] Pre-commit checks passed (rubocop + rspec + aruba)
     - [x] Commit created
     </details>
-  - [ ] Task 8.3: Implement failure safety to prevent state corruption on apply errors
-    - [ ] CLI verification (Aruba)
-    - [ ] Library verification (RSpec)
-    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [ ] Commit created
+  - [x] Task 8.3: Implement failure safety to prevent state corruption on apply errors
+    <details>
+    <summary>Checklist</summary>
+
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
+    </details>
   - [ ] Task 8.4: Implement import command/API to fetch current users from providers/plugins into managed state
     - [ ] CLI verification (Aruba)
     - [ ] Library verification (RSpec)
