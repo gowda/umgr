@@ -1,0 +1,41 @@
+name: publish-private
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.4"
+      - name: Build gem
+        run: |
+          mkdir -p pkg
+          gem build umgr.gemspec
+          mv umgr-*.gem pkg/
+      - name: Configure RubyGems credentials
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p "$HOME/.gem"
+          cat > "$HOME/.gem/credentials" <<EOF
+          ---
+          :github: Bearer ${GITHUB_TOKEN}
+          EOF
+          chmod 0600 "$HOME/.gem/credentials"
+      - name: Publish to GitHub Packages
+        env:
+          OWNER: ${{ github.repository_owner }}
+        run: |
+          gem_file="$(ls pkg/*.gem | head -n 1)"
+          gem push --key github --host "https://rubygems.pkg.github.com/${OWNER}" "$gem_file"

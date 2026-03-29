@@ -132,13 +132,13 @@
 
 - [ ] Phase 10: Release + Distribution
   - [x] Prerequisite: Task 9.4 static website is completed before publishing work
-  - [ ] Task 10.1: Add private publish workflow for GitHub Packages triggered by GitHub Release publish event
-    - [ ] Use `on: release` with `types: [published]`
-    - [ ] Configure publish auth using `GITHUB_TOKEN` with required package permissions
-    - [ ] CLI verification (Aruba)
-    - [ ] Library verification (RSpec)
-    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [ ] Commit created
+  - [x] Task 10.1: Add private publish workflow for GitHub Packages triggered by GitHub Release publish event
+    - [x] Use `on: release` with `types: [published]`
+    - [x] Configure publish auth using `GITHUB_TOKEN` with required package permissions
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
   - [ ] Task 10.2: Enforce progressive SemVer validation in release workflow before publish
     - [ ] Validate release tag format and match against gem version
     - [ ] Ensure new release version is strictly greater than previously published registry version
