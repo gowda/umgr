@@ -190,6 +190,26 @@ RSpec.describe Umgr::Runner do
     end
   end
 
+  it 'adds canonical identity to desired_state resources' do
+    Dir.mktmpdir do |tmp_dir|
+      File.write(
+        File.join(tmp_dir, 'users.yml'),
+        <<~YAML
+          version: 1
+          resources:
+            - provider: echo
+              type: user
+              name: alice
+        YAML
+      )
+
+      result = Dir.chdir(tmp_dir) { runner.dispatch(:validate, config: 'users.yml') }
+      resource = result.fetch(:options).fetch(:desired_state).fetch(:resources).first
+
+      expect(resource[:identity]).to eq('echo.user.alice')
+    end
+  end
+
   it 'raises validation error when provider is unknown in config-backed actions' do
     Dir.mktmpdir do |tmp_dir|
       File.write(

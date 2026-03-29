@@ -197,6 +197,26 @@ RSpec.describe 'umgr commands', :cli do
     expect(resource['roles']).to eq(%w[admin writer])
   end
 
+  it 'includes canonical identity for desired_state resources' do
+    write_file(
+      'users.yml',
+      <<~YAML
+        version: 1
+        resources:
+          - provider: echo
+            type: user
+            name: alice
+      YAML
+    )
+
+    run_command("#{executable} validate --config users.yml")
+
+    expect(last_command_started).to have_exit_status(0)
+    parsed = JSON.parse(last_command_started.stdout)
+    resource = parsed.fetch('options').fetch('desired_state').fetch('resources').first
+    expect(resource['identity']).to eq('echo.user.alice')
+  end
+
   it 'returns state backend path for commands' do
     run_command("#{executable} show")
 

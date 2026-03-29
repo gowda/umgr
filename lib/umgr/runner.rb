@@ -124,7 +124,8 @@ module Umgr
     end
 
     def ensure_valid_config(config_path)
-      DeepSymbolizer.call(ConfigValidator.validated_config(config_path))
+      desired_state = DeepSymbolizer.call(ConfigValidator.validated_config(config_path))
+      DesiredStateEnricher.call(desired_state)
     end
 
     attr_reader :state_backend, :provider_registry
