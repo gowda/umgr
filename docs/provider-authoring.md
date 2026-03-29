@@ -103,7 +103,7 @@ module Umgr
       def current(resource:)
         # fetch current account from Acme API
         account = { email: resource.dig(:attributes, :email) }
-        { ok: true, provider: 'acme', account: account, resource: resource }
+        { ok: true, provider: 'acme', account: account }
       end
 
       def plan(desired:, current:)
