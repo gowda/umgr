@@ -71,4 +71,9 @@ class CoverageSummaryService
   end
 end
 
-CoverageSummaryService.new(ARGV.fetch(0)).call
+if ARGV.empty?
+  warn 'usage: ruby scripts/ci/coverage_summary.rb <coverage_last_run_json_path>'
+  exit 64
+end
+
+CoverageSummaryService.new(ARGV[0]).call
