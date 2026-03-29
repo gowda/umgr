@@ -109,11 +109,11 @@
     - [x] Library verification (RSpec)
     - [x] Pre-commit checks passed (rubocop + rspec + aruba)
     - [x] Commit created
-  - [ ] Task 6.2: Implement desired-vs-current diff and change-set generation
-    - [ ] CLI verification (Aruba)
-    - [ ] Library verification (RSpec)
-    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [ ] Commit created
+  - [x] Task 6.2: Implement desired-vs-current diff and change-set generation
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
   - [ ] Task 6.3: Implement plan outputs (human default + --json)
     - [ ] CLI verification (Aruba)
     - [ ] Library verification (RSpec)

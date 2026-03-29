@@ -4,7 +4,6 @@ module Umgr
   class Runner
     ACTIONS = %i[init validate plan apply show import].freeze
     AUTO_DISCOVERY_CONFIGS = %w[umgr.yml umgr.yaml umgr.json].freeze
-    INITIAL_STATE = { version: 1, resources: [].freeze }.freeze
 
     def initialize(state_backend: nil, provider_registry: nil)
       @state_backend = state_backend || StateBackend.new
@@ -30,8 +29,8 @@ module Umgr
       existing_state = state_backend.read
       return completed(:init, 'already_initialized', options, existing_state) if existing_state
 
-      state_backend.write(INITIAL_STATE)
-      completed(:init, 'initialized', options, INITIAL_STATE)
+      state_backend.write(StateTemplate::INITIAL_STATE)
+      completed(:init, 'initialized', options, StateTemplate::INITIAL_STATE)
     end
 
     def validate(**options)
@@ -41,7 +40,7 @@ module Umgr
 
     def plan(**options)
       resolved_options = with_resolved_config(:plan, options)
-      not_implemented(:plan, resolved_options)
+      PlanResultBuilder.call(state_backend: state_backend, options: resolved_options)
     end
 
     def apply(**options)
