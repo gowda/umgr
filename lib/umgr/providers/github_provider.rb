@@ -39,13 +39,7 @@ module Umgr
       end
 
       def plan(desired:, current:)
-        {
-          ok: false,
-          provider: 'github',
-          status: 'not_implemented',
-          desired: desired,
-          current: current
-        }
+        GithubPlanBuilder.call(desired: desired, current: current)
       end
 
       def apply(changeset:)

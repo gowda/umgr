@@ -140,13 +140,13 @@
     - [x] Library verification (RSpec)
     - [x] Pre-commit checks passed (rubocop + rspec + aruba)
     - [x] Commit created
-  - [ ] Task 7.3: Implement GitHub drift planning for org + team membership
-    - [ ] Detect invite/add/remove/no-change actions from desired vs current state
-    - [ ] Include provider-specific plan details in structured output
-    - [ ] CLI verification (Aruba)
-    - [ ] Library verification (RSpec)
-    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [ ] Commit created
+  - [x] Task 7.3: Implement GitHub drift planning for org + team membership
+    - [x] Detect invite/add/remove/no-change actions from desired vs current state
+    - [x] Include provider-specific plan details in structured output
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
   - [ ] Task 7.4: Implement GitHub apply execution for membership reconciliation
     - [ ] Apply org invitations and team membership updates safely
     - [ ] Persist resulting state and preserve idempotency guarantees
@@ -232,6 +232,30 @@
     - [ ] Define release-triggered workflow gates for RubyGems publish
     - [ ] Configure OIDC permissions (`id-token: write`) and trusted publishing prerequisites
     - [ ] Document promotion path from private prerelease to public stable release
+    - [ ] CLI verification (Aruba)
+    - [ ] Library verification (RSpec)
+    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [ ] Commit created
+
+- [ ] Phase 11: Post-Release DSL Config Generator
+  - [ ] Task 11.1: Add Ruby DSL compiler that generates authoritative YAML/JSON config output (DSL is not runtime source)
+    - [ ] Define deterministic compile command (`umgr compile`) and output path policy
+    - [ ] Ensure compiled output strictly conforms to existing config schema validation
+    - [ ] CLI verification (Aruba)
+    - [ ] Library verification (RSpec)
+    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [ ] Commit created
+  - [ ] Task 11.2: Add branching/looping-friendly DSL constructs for account lifecycles and provider matrices
+    - [ ] Support conditional inclusion and iteration helpers without changing final config schema
+    - [ ] Add deterministic ordering guarantees to avoid noisy diffs in generated config
+    - [ ] CLI verification (Aruba)
+    - [ ] Library verification (RSpec)
+    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [ ] Commit created
+  - [ ] Task 11.3: Add DSL safety rails and docs
+    - [ ] Restrict side effects in DSL evaluation context and document recommended usage patterns
+    - [ ] Add examples showing DSL -> compiled YAML/JSON workflow
+    - [ ] Update README with explicit guidance: compile output is canonical input for `validate/plan/apply/import`
     - [ ] CLI verification (Aruba)
     - [ ] Library verification (RSpec)
     - [ ] Pre-commit checks passed (rubocop + rspec + aruba)

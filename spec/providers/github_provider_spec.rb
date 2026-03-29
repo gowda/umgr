@@ -143,11 +143,78 @@ RSpec.describe Umgr::Providers::GithubProvider do
       .to raise_error(Umgr::Errors::ValidationError, /token_env.*is not set/)
   end
 
-  it 'returns not_implemented status for plan' do
-    result = provider.plan(desired: { name: 'alice' }, current: { name: 'alice' })
+  it 'plans invite and team additions when user is missing from current state' do
+    result = provider.plan(
+      desired: { provider: 'github', type: 'user', name: 'alice', teams: %w[admins platform] },
+      current: nil
+    )
 
-    expect(result[:ok]).to eq(false)
-    expect(result[:status]).to eq('not_implemented')
+    expect(result).to include(
+      ok: true,
+      provider: 'github',
+      status: 'planned',
+      organization_action: 'invite'
+    )
+    expect(result.fetch(:team_actions)).to eq(add: %w[admins platform], remove: [], unchanged: [])
+    expect(result.fetch(:operations)).to eq(
+      [
+        { type: 'invite_org_member', login: 'alice' },
+        { type: 'add_team_membership', login: 'alice', team: 'admins' },
+        { type: 'add_team_membership', login: 'alice', team: 'platform' }
+      ]
+    )
+  end
+
+  it 'plans team membership add and remove operations' do
+    result = provider.plan(
+      desired: { provider: 'github', type: 'user', name: 'alice', teams: %w[admins security] },
+      current: { provider: 'github', type: 'user', name: 'alice', teams: %w[admins platform] }
+    )
+
+    expect(result).to include(
+      ok: true,
+      provider: 'github',
+      status: 'planned',
+      organization_action: 'keep'
+    )
+    expect(result.fetch(:team_actions)).to eq(add: ['security'], remove: ['platform'], unchanged: ['admins'])
+    expect(result.fetch(:operations)).to eq(
+      [
+        { type: 'add_team_membership', login: 'alice', team: 'security' },
+        { type: 'remove_team_membership', login: 'alice', team: 'platform' }
+      ]
+    )
+  end
+
+  it 'plans no_change when desired and current github membership match' do
+    result = provider.plan(
+      desired: { provider: 'github', type: 'user', name: 'alice', teams: %w[admins platform] },
+      current: { provider: 'github', type: 'user', name: 'alice', teams: %w[platform admins] }
+    )
+
+    expect(result).to include(
+      ok: true,
+      provider: 'github',
+      status: 'planned',
+      organization_action: 'keep'
+    )
+    expect(result.fetch(:team_actions)).to eq(add: [], remove: [], unchanged: %w[admins platform])
+    expect(result.fetch(:operations)).to eq([{ type: 'no_change', login: 'alice' }])
+  end
+
+  it 'plans org membership removal when user is removed from desired state' do
+    result = provider.plan(
+      desired: nil,
+      current: { provider: 'github', type: 'user', name: 'alice', teams: %w[admins platform] }
+    )
+
+    expect(result).to include(
+      ok: true,
+      provider: 'github',
+      status: 'planned',
+      organization_action: 'remove'
+    )
+    expect(result.fetch(:operations)).to eq([{ type: 'remove_org_member', login: 'alice' }])
   end
 
   it 'returns not_implemented status for apply' do

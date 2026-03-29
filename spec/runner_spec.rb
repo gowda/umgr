@@ -76,6 +76,55 @@ RSpec.describe Umgr::Runner do
     end
   end
 
+  it 'includes github provider-specific plan details in structured plan changes' do
+    Dir.mktmpdir do |tmp_dir|
+      backend = Umgr::StateBackend.new(root_dir: tmp_dir)
+      backend.write(
+        version: 1,
+        resources: [
+          { provider: 'github', type: 'user', name: 'alice', org: 'acme', teams: %w[admins platform] }
+        ]
+      )
+      local_runner = described_class.new(state_backend: backend)
+      File.write(
+        File.join(tmp_dir, 'users.yml'),
+        <<~YAML
+          version: 1
+          resources:
+            - provider: github
+              type: user
+              name: alice
+              org: acme
+              token: secret
+              teams:
+                - admins
+                - security
+        YAML
+      )
+
+      result = Dir.chdir(tmp_dir) { local_runner.dispatch(:plan, config: 'users.yml') }
+      change = result.fetch(:changeset).fetch(:changes).find { |item| item[:identity] == 'github.user.alice' }
+
+      expect(change[:action]).to eq('update')
+      expect(change.fetch(:provider_plan)).to include(
+        provider: 'github',
+        organization_action: 'keep',
+        status: 'planned'
+      )
+      expect(change.fetch(:provider_plan).fetch(:team_actions)).to eq(
+        add: ['security'],
+        remove: ['platform'],
+        unchanged: ['admins']
+      )
+      expect(change.fetch(:provider_plan).fetch(:operations)).to eq(
+        [
+          { type: 'add_team_membership', login: 'alice', team: 'security' },
+          { type: 'remove_team_membership', login: 'alice', team: 'platform' }
+        ]
+      )
+    end
+  end
+
   it 'returns not_initialized when show is called without state' do
     Dir.mktmpdir do |tmp_dir|
       backend = Umgr::StateBackend.new(root_dir: tmp_dir)

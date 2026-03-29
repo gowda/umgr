@@ -44,4 +44,58 @@ RSpec.describe Umgr::PlanResultBuilder do
       actions: { create: 1, update: 0, delete: 0 }
     )
   end
+
+  it 'enriches changes with provider-specific plan details when registry is provided' do
+    provider_registry = instance_double(Umgr::ProviderRegistry)
+    provider = instance_double(Umgr::Providers::GithubProvider)
+    desired = { provider: 'github', type: 'user', name: 'alice', identity: 'github.user.alice', teams: ['admins'] }
+    current = { provider: 'github', type: 'user', name: 'alice', identity: 'github.user.alice', teams: ['platform'] }
+    allow(state_backend).to receive(:read).and_return(version: 1, resources: [current])
+    allow(provider_registry).to receive(:fetch).with('github').and_return(provider)
+    allow(provider).to receive(:plan).with(desired: desired, current: current).and_return(
+      ok: true,
+      provider: 'github',
+      status: 'planned',
+      operations: [{ type: 'add_team_membership', team: 'admins', login: 'alice' }]
+    )
+    custom_options = { config: '/tmp/users.yml', desired_state: { version: 1, resources: [desired] } }
+
+    result = described_class.call(
+      state_backend: state_backend,
+      options: custom_options,
+      provider_registry: provider_registry
+    )
+
+    change = result.fetch(:changeset).fetch(:changes).first
+    expect(change[:action]).to eq('update')
+    expect(change.fetch(:provider_plan)).to eq(
+      ok: true,
+      provider: 'github',
+      status: 'planned',
+      operations: [{ type: 'add_team_membership', team: 'admins', login: 'alice' }]
+    )
+  end
+
+  it 'keeps change unchanged when provider name cannot be resolved' do
+    provider_registry = instance_double(Umgr::ProviderRegistry)
+    change = { identity: 'unknown.user.alice', action: 'update', desired: nil, current: nil }
+
+    result = described_class.send(:enrich_change, change, provider_registry)
+
+    expect(result).to eq(change)
+  end
+
+  it 'keeps change unchanged when provider plan result is not includable' do
+    provider_registry = instance_double(Umgr::ProviderRegistry)
+    provider = instance_double(Umgr::Providers::GithubProvider)
+    desired = { provider: 'github', type: 'user', name: 'alice', identity: 'github.user.alice', teams: [] }
+    current = { provider: 'github', type: 'user', name: 'alice', identity: 'github.user.alice', teams: ['admins'] }
+    change = { identity: 'github.user.alice', action: 'update', desired: desired, current: current }
+    allow(provider_registry).to receive(:fetch).with('github').and_return(provider)
+    allow(provider).to receive(:plan).with(desired: desired, current: current).and_return(ok: false, status: 'error')
+
+    result = described_class.send(:enrich_change, change, provider_registry)
+
+    expect(result).to eq(change)
+  end
 end
