@@ -88,7 +88,7 @@ RSpec.describe Umgr::Providers::GithubApiClient do
     remove_result = client.remove_team_membership(org: 'acme', team_slug: 'platform', login: 'alice', token: 'secret')
 
     expect(add_result[:state] || add_result['state']).to eq('active')
-    expect(remove_result).to eq(true)
+    expect(remove_result).to be(true)
   end
 
   it 'removes organization membership' do
@@ -96,6 +96,6 @@ RSpec.describe Umgr::Providers::GithubApiClient do
 
     result = client.remove_org_member(org: 'acme', login: 'alice', token: 'secret')
 
-    expect(result).to eq(true)
+    expect(result).to be(true)
   end
 end

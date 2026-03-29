@@ -45,8 +45,8 @@ RSpec.describe Umgr::StateBackend do
 
       backend.delete
 
-      expect(File.file?(backend.path)).to eq(false)
-      expect(backend.read).to eq(nil)
+      expect(File.file?(backend.path)).to be(false)
+      expect(backend.read).to be_nil
     end
   end
 end

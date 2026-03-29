@@ -27,9 +27,9 @@ RSpec.describe 'umgr commands', :cli do
 
     expect(last_command_started).to have_exit_status(0)
     parsed = JSON.parse(last_command_started.stdout)
-    expect(parsed['ok']).to eq(true)
+    expect(parsed['ok']).to be(true)
     expect(parsed['status']).to eq('not_initialized')
-    expect(parsed['state']).to eq(nil)
+    expect(parsed['state']).to be_nil
   end
 
   it 'returns current state for show when state exists' do
@@ -41,7 +41,7 @@ RSpec.describe 'umgr commands', :cli do
 
     expect(last_command_started).to have_exit_status(0)
     parsed = JSON.parse(last_command_started.stdout)
-    expect(parsed['ok']).to eq(true)
+    expect(parsed['ok']).to be(true)
     expect(parsed['status']).to eq('ok')
     expect(parsed['state']).to eq(
       'version' => 1,
@@ -54,12 +54,12 @@ RSpec.describe 'umgr commands', :cli do
 
     expect(last_command_started).to have_exit_status(0)
     parsed = JSON.parse(last_command_started.stdout)
-    expect(parsed['ok']).to eq(true)
+    expect(parsed['ok']).to be(true)
     expect(parsed['status']).to eq('initialized')
     expect(parsed['state']).to eq('version' => 1, 'resources' => [])
     state_path = parsed['state_path']
     expect(state_path).to end_with('/.umgr/state.json')
-    expect(File.file?(state_path)).to eq(true)
+    expect(File.file?(state_path)).to be(true)
   end
 
   it 'returns already_initialized when state file exists' do
@@ -68,7 +68,7 @@ RSpec.describe 'umgr commands', :cli do
 
     expect(last_command_started).to have_exit_status(0)
     parsed = JSON.parse(last_command_started.stdout)
-    expect(parsed['ok']).to eq(true)
+    expect(parsed['ok']).to be(true)
     expect(parsed['status']).to eq('already_initialized')
     expect(parsed['state']).to eq('version' => 1, 'resources' => [])
   end
@@ -151,7 +151,7 @@ RSpec.describe 'umgr commands', :cli do
     expect(last_command_started).to have_exit_status(0)
     parsed = JSON.parse(last_command_started.stdout)
 
-    expect(parsed['ok']).to eq(true)
+    expect(parsed['ok']).to be(true)
     expect(parsed['action']).to eq('apply')
     expect(parsed['status']).to eq('applied')
     expect(parsed.fetch('changeset').fetch('summary')).to eq(
@@ -193,7 +193,7 @@ RSpec.describe 'umgr commands', :cli do
     expect(last_command_started).to have_exit_status(0)
     parsed = JSON.parse(last_command_started.stdout)
 
-    expect(parsed['ok']).to eq(true)
+    expect(parsed['ok']).to be(true)
     expect(parsed['action']).to eq('import')
     expect(parsed['status']).to eq('imported')
     expect(parsed['imported_count']).to eq(1)
@@ -297,7 +297,7 @@ RSpec.describe 'umgr commands', :cli do
     expect(last_command_started).to have_exit_status(0)
     parsed = JSON.parse(last_command_started.stdout)
 
-    expect(parsed['ok']).to eq(true)
+    expect(parsed['ok']).to be(true)
     expect(parsed['action']).to eq('plan')
     expect(parsed['status']).to eq('planned')
     expect(parsed.fetch('drift')).to eq(
@@ -387,7 +387,7 @@ RSpec.describe 'umgr commands', :cli do
     expect(last_command_started).to have_exit_status(Umgr::Errors::ValidationError::EXIT_CODE)
     error_line = last_command_started.stderr.lines.map(&:strip).reject(&:empty?).last
     parsed = JSON.parse(error_line)
-    expect(parsed['ok']).to eq(false)
+    expect(parsed['ok']).to be(false)
     expect(parsed['error']['type']).to eq('Umgr::Errors::ValidationError')
   end
 
