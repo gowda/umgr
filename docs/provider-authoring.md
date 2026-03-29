@@ -19,6 +19,12 @@ These methods are defined in [`Umgr::Provider`](../lib/umgr/provider.rb). The
 base class raises `Umgr::Errors::AbstractMethodError` when a method is not
 implemented.
 
+Validation failure contract for `validate(resource:)`:
+
+- Preferred: raise `Umgr::Errors::ValidationError` with a clear message.
+- Also supported: return a hash with `ok: false` (or `"ok" => false`), which
+  `umgr` promotes to `Umgr::Errors::ValidationError`.
+
 ## Contract Enforcement
 
 Registration is validated by [`Umgr::ProviderContract`](../lib/umgr/provider_contract.rb):
