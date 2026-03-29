@@ -18,6 +18,14 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.4"
+      - name: Validate release tag and version progression
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          REPOSITORY_OWNER: ${{ github.repository_owner }}
+          REPOSITORY_OWNER_TYPE: ${{ github.event.repository.owner.type }}
+          PACKAGE_NAME: umgr
+        run: ruby scripts/ci/release_version_guard.rb
       - name: Build gem
         run: |
           mkdir -p pkg

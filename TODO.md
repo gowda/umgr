@@ -139,14 +139,14 @@
     - [x] Library verification (RSpec)
     - [x] Pre-commit checks passed (rubocop + rspec + aruba)
     - [x] Commit created
-  - [ ] Task 10.2: Enforce progressive SemVer validation in release workflow before publish
-    - [ ] Validate release tag format and match against gem version
-    - [ ] Ensure new release version is strictly greater than previously published registry version
-    - [ ] Fail workflow on SemVer or monotonic-version violations
-    - [ ] CLI verification (Aruba)
-    - [ ] Library verification (RSpec)
-    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [ ] Commit created
+  - [x] Task 10.2: Enforce progressive SemVer validation in release workflow before publish
+    - [x] Validate release tag format and match against gem version
+    - [x] Ensure new release version is strictly greater than previously published registry version
+    - [x] Fail workflow on SemVer or monotonic-version violations
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
   - [ ] Task 10.3: Document private installation and Gemfile usage for GitHub Packages in README.md
     - [ ] Add `gem install` instructions for private GitHub Packages consumption
     - [ ] Add Gemfile `source` + authentication setup for private package usage
