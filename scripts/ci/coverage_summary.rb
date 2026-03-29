@@ -2,50 +2,73 @@
 
 require 'json'
 
-last_run_file = 'coverage/.last_run.json'
-section_title = ARGV.fetch(0, 'Coverage')
+class CoverageSummaryService
+  def initialize(last_run_file)
+    @last_run_file = last_run_file
+  end
 
-unless File.exist?(last_run_file)
-  warn 'coverage summary unavailable'
-  exit 0
-end
+  def call
+    unless File.exist?(last_run_file)
+      warn 'coverage summary unavailable'
+      return
+    end
 
-result = JSON.parse(File.read(last_run_file)).fetch('result')
+    result = JSON.parse(File.read(last_run_file)).fetch('result')
+    line = format_line(result)
+    branch = format_branch(result)
 
-line = if result.key?('covered_percent')
-         format(
-           'line: %<percent>.2f%% (%<covered>d/%<total>d)',
-           percent: result.fetch('covered_percent'),
-           covered: result.fetch('covered_lines'),
-           total: result.fetch('total_lines')
-         )
-       elsif result.key?('line')
-         format('line: %<percent>.2f%%', percent: result.fetch('line'))
-       else
-         'line: n/a'
-       end
+    puts line
+    puts branch
+    append_step_summary(line, branch)
+  end
 
-branch = if result['covered_branches'] && result['total_branches']
-           format(
-             'branch: %<percent>.2f%% (%<covered>d/%<total>d)',
-             percent: result.fetch('covered_branches_percent'),
-             covered: result.fetch('covered_branches'),
-             total: result.fetch('total_branches')
-           )
-         elsif result.key?('branch')
-           format('branch: %<percent>.2f%%', percent: result.fetch('branch'))
-         else
-           'branch: n/a'
-         end
+  private
 
-puts line
-puts branch
+  attr_reader :last_run_file
 
-step_summary = ENV.fetch('GITHUB_STEP_SUMMARY', nil)
-if step_summary && !step_summary.empty?
-  File.open(step_summary, 'a') do |file|
-    file.puts "### #{section_title}"
-    file.puts "- #{line}"
-    file.puts "- #{branch}"
+  def format_line(result)
+    return format_line_with_totals(result) if result.key?('covered_percent')
+    return format('line: %<percent>.2f%%', percent: result.fetch('line')) if result.key?('line')
+
+    'line: n/a'
+  end
+
+  def format_branch(result)
+    return format_branch_with_totals(result) if result['covered_branches'] && result['total_branches']
+    return format('branch: %<percent>.2f%%', percent: result.fetch('branch')) if result.key?('branch')
+
+    'branch: n/a'
+  end
+
+  def format_line_with_totals(result)
+    format(
+      'line: %<percent>.2f%% (%<covered>d/%<total>d)',
+      percent: result.fetch('covered_percent'),
+      covered: result.fetch('covered_lines'),
+      total: result.fetch('total_lines')
+    )
+  end
+
+  def format_branch_with_totals(result)
+    format(
+      'branch: %<percent>.2f%% (%<covered>d/%<total>d)',
+      percent: result.fetch('covered_branches_percent'),
+      covered: result.fetch('covered_branches'),
+      total: result.fetch('total_branches')
+    )
+  end
+
+  def append_step_summary(line, branch)
+    step_summary = ENV.fetch('GITHUB_STEP_SUMMARY', nil)
+    return if step_summary.nil? || step_summary.empty?
+
+    section_title = ENV.fetch('COVERAGE_SECTION', 'Coverage')
+    File.open(step_summary, 'a') do |file|
+      file.puts "### #{section_title}"
+      file.puts "- #{line}"
+      file.puts "- #{branch}"
+    end
   end
 end
+
+CoverageSummaryService.new(ARGV.fetch(0)).call
