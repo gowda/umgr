@@ -50,6 +50,22 @@ module Umgr
         builder.resource(provider: provider, type: type, name: name, **)
       end
 
+      def if_enabled(condition, &)
+        instance_eval(&) if condition
+      end
+
+      def for_each(items, &)
+        items.each do |item|
+          instance_exec(item, &)
+        end
+      end
+
+      def provider_matrix(providers:, accounts:, type: 'user', **shared_options)
+        providers.each do |provider|
+          emit_matrix_resources(provider, type, accounts, shared_options)
+        end
+      end
+
       def resources(items)
         items.each do |item|
           resource(**item.transform_keys(&:to_sym))
@@ -65,6 +81,36 @@ module Umgr
       private
 
       attr_reader :builder
+
+      def emit_matrix_resources(provider, type, accounts, shared_options)
+        accounts.each do |entry|
+          emit_matrix_resource(provider, type, entry, shared_options)
+        end
+      end
+
+      def emit_matrix_resource(provider, type, entry, shared_options)
+        account = normalize_account_entry(entry)
+        account_name = account.delete('name')
+        resource(
+          provider: provider.to_s,
+          type: type.to_s,
+          name: account_name.to_s,
+          **shared_options,
+          **account.transform_keys(&:to_sym)
+        )
+      end
+
+      def normalize_account_entry(entry)
+        return { 'name' => entry.to_s } unless entry.is_a?(Hash)
+
+        normalized = entry.transform_keys(&:to_s)
+        name = normalized['name']
+        if !name.is_a?(String) || name.empty?
+          raise Errors::ValidationError, 'provider_matrix account requires non-empty `name`'
+        end
+
+        normalized
+      end
     end
 
     class Builder
@@ -90,11 +136,17 @@ module Umgr
       def to_h
         {
           'version' => @version || 1,
-          'resources' => @resources
+          'resources' => sorted_resources
         }
       end
 
       private
+
+      def sorted_resources
+        @resources.sort_by do |resource|
+          [resource['provider'].to_s, resource['type'].to_s, resource['name'].to_s]
+        end
+      end
 
       def stringify_hash_keys(value)
         case value

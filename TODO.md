@@ -122,13 +122,13 @@
     - [x] Library verification (RSpec)
     - [x] Pre-commit checks passed (rubocop + rspec + aruba)
     - [x] Commit created
-  - [ ] Task 11.2: Add branching/looping-friendly DSL constructs for account lifecycles and provider matrices
-    - [ ] Support conditional inclusion and iteration helpers without changing final config schema
-    - [ ] Add deterministic ordering guarantees to avoid noisy diffs in generated config
-    - [ ] CLI verification (Aruba)
-    - [ ] Library verification (RSpec)
-    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [ ] Commit created
+  - [x] Task 11.2: Add branching/looping-friendly DSL constructs for account lifecycles and provider matrices
+    - [x] Support conditional inclusion and iteration helpers without changing final config schema
+    - [x] Add deterministic ordering guarantees to avoid noisy diffs in generated config
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
   - [ ] Task 11.3: Add DSL safety rails and docs
     - [ ] Restrict side effects in DSL evaluation context and document recommended usage patterns
     - [ ] Document precedence matrix (explicit `--config` vs `--config -` vs auto-discovery)
