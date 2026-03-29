@@ -2,6 +2,7 @@
 
 require 'json'
 require 'thor'
+require 'yaml'
 
 module Umgr
   class CLI < Thor
@@ -24,6 +25,14 @@ module Umgr
     option :config, type: :string, desc: 'Path to config file'
     def validate
       execute(:validate, **command_options)
+    end
+
+    desc 'compile', 'Compile Ruby DSL into YAML/JSON configuration'
+    option :dsl, type: :string, desc: 'Path to DSL source file (default: umgr.rb)'
+    option :format, type: :string, default: 'yaml', enum: %w[yaml json], desc: 'Output format'
+    option :output, type: :string, desc: 'Write compiled output to this file path'
+    def compile
+      execute(:compile, **command_options)
     end
 
     desc 'plan', 'Generate plan from desired state'
@@ -61,9 +70,18 @@ module Umgr
     end
 
     def render_result(action, result, options)
+      return render_compile_result(result, options) if action == :compile
       return render_plan_result(result, options) if action == :plan
 
       puts JSON.generate(result)
+    end
+
+    def render_compile_result(result, options)
+      format = options.fetch(:format, 'yaml')
+      output = serialize_compiled_config(result.fetch(:config), format)
+      output_path = options[:output]
+      File.write(File.expand_path(output_path), output) if output_path
+      puts output
     end
 
     def render_plan_result(result, options)
@@ -112,6 +130,12 @@ module Umgr
           }
         }
       )
+    end
+
+    def serialize_compiled_config(config, format)
+      return JSON.pretty_generate(config) if format == 'json'
+
+      YAML.dump(config)
     end
   end
 end

@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 
 require 'json'
+require 'yaml'
 require_relative 'spec_helper'
 
 RSpec.describe 'umgr commands', :cli do
   let(:executable) { File.expand_path('../../exe/umgr', __dir__) }
+  let(:lib_path) { File.expand_path('../../lib', __dir__) }
 
   command_invocations = {
     'validate' => '--config users.yml'
@@ -80,6 +82,36 @@ RSpec.describe 'umgr commands', :cli do
     expect(last_command_started).to have_exit_status(0)
     parsed = JSON.parse(last_command_started.stdout)
     expect(parsed['options']['config']).to end_with('users.yml')
+  end
+
+  it 'compiles DSL to yaml by default' do
+    write_file(
+      'umgr.rb',
+      <<~RUBY
+        umgr do
+          version 1
+          resource provider: 'echo', type: 'user', name: 'alice', attributes: { team: 'platform' }
+        end
+      RUBY
+    )
+
+    run_command("#{executable} compile")
+
+    expect(last_command_started).to have_exit_status(0)
+    parsed = YAML.safe_load(last_command_started.stdout, aliases: false)
+    expect(parsed).to eq(
+      {
+        'version' => 1,
+        'resources' => [
+          {
+            'provider' => 'echo',
+            'type' => 'user',
+            'name' => 'alice',
+            'attributes' => { 'team' => 'platform' }
+          }
+        ]
+      }
+    )
   end
 
   it 'returns planned changeset for desired vs current state' do
@@ -369,6 +401,19 @@ RSpec.describe 'umgr commands', :cli do
     expect(last_command_started).to have_exit_status(0)
     parsed = JSON.parse(last_command_started.stdout)
     expect(parsed['options']['config']).to end_with('umgr.yml')
+  end
+
+  it 'returns validation error for auto-discovery ambiguity between DSL and static config' do
+    write_file('umgr.rb', "umgr do\n  version 1\nend\n")
+    write_file('umgr.yml', "version: 1\nresources: []\n")
+
+    run_command("#{executable} validate")
+
+    expect(last_command_started).to have_exit_status(Umgr::Errors::ValidationError::EXIT_CODE)
+    error_line = last_command_started.stderr.lines.map(&:strip).reject(&:empty?).last
+    parsed = JSON.parse(error_line)
+    expect(parsed['error']['type']).to eq('Umgr::Errors::ValidationError')
+    expect(parsed['error']['message']).to match(/Auto-discovery ambiguity/)
   end
 
   it 'uses --config override when discovery candidates exist' do

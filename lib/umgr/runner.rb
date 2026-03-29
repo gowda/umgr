@@ -4,7 +4,7 @@ module Umgr
   class Runner
     include RunnerConfig
 
-    ACTIONS = %i[init validate plan apply show import].freeze
+    ACTIONS = %i[init compile validate plan apply show import].freeze
 
     def initialize(state_backend: nil, provider_registry: nil)
       @state_backend = state_backend || StateBackend.new
@@ -37,6 +37,14 @@ module Umgr
     def validate(**options)
       resolved_options = with_resolved_config(:validate, options)
       not_implemented(:validate, resolved_options)
+    end
+
+    def compile(**options)
+      dsl_path = resolve_dsl_path(options[:dsl])
+      compiled_config = DslCompiler.compile_file(dsl_path)
+      desired_state = DesiredStateEnricher.call(DeepSymbolizer.call(compiled_config))
+      validate_desired_state!(action: :compile, desired_state: desired_state)
+      completed_compile(options.merge(dsl: dsl_path), compiled_config)
     end
 
     def plan(**options)
@@ -89,6 +97,16 @@ module Umgr
         options: options,
         state_path: state_backend.path,
         state: state
+      }
+    end
+
+    def completed_compile(options, config)
+      {
+        ok: true,
+        action: 'compile',
+        status: 'compiled',
+        options: options,
+        config: config
       }
     end
 

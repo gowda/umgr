@@ -110,18 +110,18 @@
   </details>
 
 - [ ] Phase 11: Post-Release DSL Config Generator
-  - [ ] Task 11.1: Add Ruby DSL compiler that generates authoritative YAML/JSON config output (DSL is not runtime source)
-    - [ ] Define deterministic compile command (`umgr compile`) and output path policy
-    - [ ] Define DSL/config precedence policy for runtime commands (`validate/plan/apply/import`)
-    - [ ] Fail fast on auto-discovery ambiguity when both `umgr.rb` and `umgr.{yml,yaml,json}` exist
-    - [ ] Define explicit stdin contract: support `--config -` for piped compiled config
-    - [ ] Add pipeline example: `umgr compile | umgr plan --config -`
-    - [ ] Add pipeline example: `umgr compile | umgr apply --config -`
-    - [ ] Ensure compiled output strictly conforms to existing config schema validation
-    - [ ] CLI verification (Aruba)
-    - [ ] Library verification (RSpec)
-    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [ ] Commit created
+  - [x] Task 11.1: Add Ruby DSL compiler that generates authoritative YAML/JSON config output (DSL is not runtime source)
+    - [x] Define deterministic compile command (`umgr compile`) and output path policy
+    - [x] Define DSL/config precedence policy for runtime commands (`validate/plan/apply/import`)
+    - [x] Fail fast on auto-discovery ambiguity when both `umgr.rb` and `umgr.{yml,yaml,json}` exist
+    - [x] Define explicit stdin contract: support `--config -` for piped compiled config
+    - [x] Add pipeline example: `umgr compile | umgr plan --config -`
+    - [x] Add pipeline example: `umgr compile | umgr apply --config -`
+    - [x] Ensure compiled output strictly conforms to existing config schema validation
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
   - [ ] Task 11.2: Add branching/looping-friendly DSL constructs for account lifecycles and provider matrices
     - [ ] Support conditional inclusion and iteration helpers without changing final config schema
     - [ ] Add deterministic ordering guarantees to avoid noisy diffs in generated config
