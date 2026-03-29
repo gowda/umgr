@@ -44,6 +44,9 @@ Each platform integration is implemented as a provider/plugin.
 Provider authoring guide:
 [`docs/provider-authoring.md`](docs/provider-authoring.md)
 
+DSL compile guide:
+[`docs/dsl-compile.md`](docs/dsl-compile.md)
+
 Website:
 - Site entrypoint: [`docs/index.html`](docs/index.html)
 - Local preview/edit guide: [`docs/website.md`](docs/website.md)
@@ -62,6 +65,23 @@ umgr validate --config examples/users.yml
 umgr plan --config examples/users.yml
 umgr apply --config examples/users.yml
 umgr show
+```
+
+## DSL Compile Workflow
+
+`umgr.rb` is compile-time input only. Runtime commands (`validate`, `plan`,
+`apply`, `import`) consume YAML/JSON config, not DSL source directly.
+
+```bash
+umgr compile > umgr.yml
+umgr plan --config umgr.yml
+```
+
+Pipeline mode:
+
+```bash
+umgr compile | umgr plan --config -
+umgr compile | umgr apply --config -
 ```
 
 ## Ruby API Example

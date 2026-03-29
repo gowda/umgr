@@ -83,6 +83,16 @@ For `validate`, `plan`, `apply`, and `import` actions:
 3. Unknown providers are rejected early (`UnknownProviderGuard`).
 4. Action execution uses provider(s) from the registry.
 
+Config precedence for runtime actions:
+
+1. `--config <path>` uses explicit file input.
+2. `--config -` reads compiled config from stdin.
+3. Without `--config`, auto-discovery checks `umgr.yml`, `umgr.yaml`,
+   `umgr.json`.
+
+`umgr.rb` is compile-time only. Runtime actions do not execute DSL directly.
+Compile first with `umgr compile` (or use pipeline mode with `--config -`).
+
 For import specifically, `Runner#import` persists imported resources into
 managed state and returns `{ status: "imported", imported_count: N }`.
 
