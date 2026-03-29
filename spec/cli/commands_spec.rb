@@ -210,6 +210,49 @@ RSpec.describe 'umgr commands', :cli do
     )
   end
 
+  it 'supports end-to-end workflow from init to show' do
+    write_file(
+      'users.yml',
+      <<~YAML
+        version: 1
+        resources:
+          - provider: echo
+            type: user
+            name: alice
+            attributes:
+              team: platform
+      YAML
+    )
+
+    run_command("#{executable} init")
+    expect(last_command_started).to have_exit_status(0)
+    init_result = JSON.parse(last_command_started.stdout)
+    expect(init_result['status']).to eq('initialized')
+
+    run_command("#{executable} validate --config users.yml")
+    expect(last_command_started).to have_exit_status(0)
+    validate_result = JSON.parse(last_command_started.stdout)
+    expect(validate_result['status']).to eq('not_implemented')
+
+    run_command("#{executable} plan --config users.yml")
+    expect(last_command_started).to have_exit_status(0)
+    plan_lines = last_command_started.stdout.lines.map(&:strip).reject(&:empty?)
+    expect(plan_lines.first).to eq('Drift detected: yes (changes=1)')
+    expect(plan_lines[1]).to eq('Plan summary: create=1 update=0 delete=0 no_change=0')
+    expect(plan_lines[2..]).to eq(['CREATE echo.user.alice'])
+
+    run_command("#{executable} apply --config users.yml")
+    expect(last_command_started).to have_exit_status(0)
+    apply_result = JSON.parse(last_command_started.stdout)
+    expect(apply_result['status']).to eq('applied')
+
+    run_command("#{executable} show")
+    expect(last_command_started).to have_exit_status(0)
+    show_result = JSON.parse(last_command_started.stdout)
+    expect(show_result['status']).to eq('ok')
+    expect(show_result['state']).to eq(apply_result['state'])
+  end
+
   it 'returns no drift when plan is run after apply for the same config' do
     write_file(
       'users.yml',

@@ -65,6 +65,40 @@ RSpec.describe Umgr::Runner do
     end
   end
 
+  it 'supports end-to-end workflow from init to show' do
+    Dir.mktmpdir do |tmp_dir|
+      backend = Umgr::StateBackend.new(root_dir: tmp_dir)
+      local_runner = described_class.new(state_backend: backend)
+      File.write(
+        File.join(tmp_dir, 'users.yml'),
+        <<~YAML
+          version: 1
+          resources:
+            - provider: echo
+              type: user
+              name: alice
+              attributes:
+                team: platform
+        YAML
+      )
+
+      init_result = Dir.chdir(tmp_dir) { local_runner.dispatch(:init) }
+      validate_result = Dir.chdir(tmp_dir) { local_runner.dispatch(:validate, config: 'users.yml') }
+      plan_result = Dir.chdir(tmp_dir) { local_runner.dispatch(:plan, config: 'users.yml') }
+      apply_result = Dir.chdir(tmp_dir) { local_runner.dispatch(:apply, config: 'users.yml') }
+      show_result = Dir.chdir(tmp_dir) { local_runner.dispatch(:show) }
+
+      expect(init_result[:status]).to eq('initialized')
+      expect(validate_result[:status]).to eq('not_implemented')
+      expect(plan_result[:status]).to eq('planned')
+      expect(plan_result.dig(:changeset, :summary)).to eq(create: 1, update: 0, delete: 0, no_change: 0)
+      expect(apply_result[:status]).to eq('applied')
+      expect(show_result[:status]).to eq('ok')
+      expect(show_result[:state]).to eq(apply_result[:state])
+      expect(backend.read).to eq(show_result[:state])
+    end
+  end
+
   it 'applies desired state and persists resulting state' do
     Dir.mktmpdir do |tmp_dir|
       backend = Umgr::StateBackend.new(root_dir: tmp_dir)
