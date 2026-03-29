@@ -115,4 +115,50 @@ RSpec.describe Umgr::DslCompiler do
       )
     end
   end
+
+  it 'raises validation error when provider_matrix account name is missing' do
+    Dir.mktmpdir do |tmp_dir|
+      dsl_path = File.join(tmp_dir, 'umgr.rb')
+      File.write(
+        dsl_path,
+        <<~RUBY
+          umgr do
+            version 1
+
+            provider_matrix(
+              providers: %w[github],
+              accounts: [{ attributes: { team: 'eng' } }]
+            )
+          end
+        RUBY
+      )
+
+      expect do
+        described_class.compile_file(dsl_path)
+      end.to raise_error(Umgr::Errors::ValidationError, /provider_matrix account requires non-empty `name`/)
+    end
+  end
+
+  it 'raises validation error when provider_matrix account name is empty' do
+    Dir.mktmpdir do |tmp_dir|
+      dsl_path = File.join(tmp_dir, 'umgr.rb')
+      File.write(
+        dsl_path,
+        <<~RUBY
+          umgr do
+            version 1
+
+            provider_matrix(
+              providers: %w[github],
+              accounts: [{ name: '', attributes: { team: 'eng' } }]
+            )
+          end
+        RUBY
+      )
+
+      expect do
+        described_class.compile_file(dsl_path)
+      end.to raise_error(Umgr::Errors::ValidationError, /provider_matrix account requires non-empty `name`/)
+    end
+  end
 end
