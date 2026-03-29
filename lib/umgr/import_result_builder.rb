@@ -44,7 +44,7 @@ module Umgr
       return [resource] if resource
 
       account = result[:account] || result['account']
-      return [fallback_resource.merge(attributes: account)] if account
+      return [fallback_resource.merge(attributes: account)] if account.is_a?(Hash)
 
       raise Errors::InternalError, 'Provider current result missing imported resources'
     end

@@ -77,4 +77,44 @@ RSpec.describe Umgr::ImportResultBuilder do
       described_class.call(state_backend: state_backend, options: options, provider_registry: provider_registry)
     end.to raise_error(Umgr::Errors::InternalError, /denied/)
   end
+
+  it 'uses account fallback shape when provider returns account attributes hash' do
+    allow(provider_registry).to receive(:fetch).with('echo').and_return(provider)
+    allow(provider).to receive(:current).and_return(
+      ok: true,
+      account: { team: 'security', title: 'engineer' }
+    )
+    allow(state_backend).to receive(:write)
+
+    result = described_class.call(state_backend: state_backend, options: options, provider_registry: provider_registry)
+    resource = result.fetch(:state).fetch(:resources).first
+
+    expect(resource).to eq(
+      provider: 'echo',
+      type: 'user',
+      name: 'alice',
+      attributes: { team: 'security', title: 'engineer' },
+      identity: 'echo.user.alice'
+    )
+  end
+
+  it 'raises internal error when provider current returns no recognized resource keys' do
+    allow(provider_registry).to receive(:fetch).with('echo').and_return(provider)
+    allow(provider).to receive(:current).and_return(ok: true, ignored: 'value')
+    expect(state_backend).not_to receive(:write)
+
+    expect do
+      described_class.call(state_backend: state_backend, options: options, provider_registry: provider_registry)
+    end.to raise_error(Umgr::Errors::InternalError, /missing imported resources/)
+  end
+
+  it 'raises internal error when account fallback is not a hash' do
+    allow(provider_registry).to receive(:fetch).with('echo').and_return(provider)
+    allow(provider).to receive(:current).and_return(ok: true, account: 'some_string')
+    expect(state_backend).not_to receive(:write)
+
+    expect do
+      described_class.call(state_backend: state_backend, options: options, provider_registry: provider_registry)
+    end.to raise_error(Umgr::Errors::InternalError, /missing imported resources/)
+  end
 end
