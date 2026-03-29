@@ -164,6 +164,39 @@ RSpec.describe 'umgr commands', :cli do
     expect(parsed['error']['message']).to match(/Unknown provider\(s\) for validate: github/)
   end
 
+  it 'preserves attributes and provider-specific resource fields with echo provider' do
+    write_file(
+      'users.yml',
+      <<~YAML
+        version: 1
+        resources:
+          - provider: echo
+            type: user
+            name: alice
+            attributes:
+              email: alice@example.com
+              first_name: Alice
+            org: platform
+            roles:
+              - admin
+              - writer
+      YAML
+    )
+
+    run_command("#{executable} validate --config users.yml")
+
+    expect(last_command_started).to have_exit_status(0)
+    parsed = JSON.parse(last_command_started.stdout)
+    resource = parsed.fetch('options').fetch('desired_state').fetch('resources').first
+
+    expect(resource['attributes']).to eq(
+      'email' => 'alice@example.com',
+      'first_name' => 'Alice'
+    )
+    expect(resource['org']).to eq('platform')
+    expect(resource['roles']).to eq(%w[admin writer])
+  end
+
   it 'returns state backend path for commands' do
     run_command("#{executable} show")
 
