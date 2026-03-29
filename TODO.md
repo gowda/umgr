@@ -236,3 +236,27 @@
     - [ ] Library verification (RSpec)
     - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
     - [ ] Commit created
+
+- [ ] Phase 11: Post-Release DSL Config Generator
+  - [ ] Task 11.1: Add Ruby DSL compiler that generates authoritative YAML/JSON config output (DSL is not runtime source)
+    - [ ] Define deterministic compile command (`umgr compile`) and output path policy
+    - [ ] Ensure compiled output strictly conforms to existing config schema validation
+    - [ ] CLI verification (Aruba)
+    - [ ] Library verification (RSpec)
+    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [ ] Commit created
+  - [ ] Task 11.2: Add branching/looping-friendly DSL constructs for account lifecycles and provider matrices
+    - [ ] Support conditional inclusion and iteration helpers without changing final config schema
+    - [ ] Add deterministic ordering guarantees to avoid noisy diffs in generated config
+    - [ ] CLI verification (Aruba)
+    - [ ] Library verification (RSpec)
+    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [ ] Commit created
+  - [ ] Task 11.3: Add DSL safety rails and docs
+    - [ ] Restrict side effects in DSL evaluation context and document recommended usage patterns
+    - [ ] Add examples showing DSL -> compiled YAML/JSON workflow
+    - [ ] Update README with explicit guidance: compile output is canonical input for `validate/plan/apply/import`
+    - [ ] CLI verification (Aruba)
+    - [ ] Library verification (RSpec)
+    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [ ] Commit created
