@@ -123,6 +123,24 @@
     - [x] Library verification (RSpec)
     - [x] Pre-commit checks passed (rubocop + rspec + aruba)
     - [x] Commit created
+  - [x] Task 11.2: Add branching/looping-friendly DSL constructs for account lifecycles and provider matrices
+    - [x] Support conditional inclusion and iteration helpers without changing final config schema
+    - [x] Add deterministic ordering guarantees to avoid noisy diffs in generated config
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
+  - [x] Task 11.3: Add DSL safety rails and docs
+    - [x] Restrict side effects in DSL evaluation context and document recommended usage patterns
+    - [x] Document precedence matrix (explicit `--config` vs `--config -` vs auto-discovery)
+    - [x] Document ambiguity error messaging and resolution steps (`--config` or compile pipeline)
+    - [x] Clarify runtime commands never execute DSL directly; DSL must be compiled
+    - [x] Add examples showing DSL -> compiled YAML/JSON workflow
+    - [x] Update README with explicit guidance: compile output is canonical input for `validate/plan/apply/import`
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
 
 - [ ] Phase 12: DSL Assignment-Only Syntax
   - [x] Task 12.1: Enforce DSL structure and scope
@@ -156,21 +174,3 @@
     - [ ] Library verification (RSpec)
     - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
     - [ ] Commit created
-  - [x] Task 11.2: Add branching/looping-friendly DSL constructs for account lifecycles and provider matrices
-    - [x] Support conditional inclusion and iteration helpers without changing final config schema
-    - [x] Add deterministic ordering guarantees to avoid noisy diffs in generated config
-    - [x] CLI verification (Aruba)
-    - [x] Library verification (RSpec)
-    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [x] Commit created
-  - [x] Task 11.3: Add DSL safety rails and docs
-    - [x] Restrict side effects in DSL evaluation context and document recommended usage patterns
-    - [x] Document precedence matrix (explicit `--config` vs `--config -` vs auto-discovery)
-    - [x] Document ambiguity error messaging and resolution steps (`--config` or compile pipeline)
-    - [x] Clarify runtime commands never execute DSL directly; DSL must be compiled
-    - [x] Add examples showing DSL -> compiled YAML/JSON workflow
-    - [x] Update README with explicit guidance: compile output is canonical input for `validate/plan/apply/import`
-    - [x] CLI verification (Aruba)
-    - [x] Library verification (RSpec)
-    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [x] Commit created
