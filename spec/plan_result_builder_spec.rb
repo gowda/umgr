@@ -75,4 +75,27 @@ RSpec.describe Umgr::PlanResultBuilder do
       operations: [{ type: 'add_team_membership', team: 'admins', login: 'alice' }]
     )
   end
+
+  it 'keeps change unchanged when provider name cannot be resolved' do
+    provider_registry = instance_double(Umgr::ProviderRegistry)
+    change = { identity: 'unknown.user.alice', action: 'update', desired: nil, current: nil }
+
+    result = described_class.send(:enrich_change, change, provider_registry)
+
+    expect(result).to eq(change)
+  end
+
+  it 'keeps change unchanged when provider plan result is not includable' do
+    provider_registry = instance_double(Umgr::ProviderRegistry)
+    provider = instance_double(Umgr::Providers::GithubProvider)
+    desired = { provider: 'github', type: 'user', name: 'alice', identity: 'github.user.alice', teams: [] }
+    current = { provider: 'github', type: 'user', name: 'alice', identity: 'github.user.alice', teams: ['admins'] }
+    change = { identity: 'github.user.alice', action: 'update', desired: desired, current: current }
+    allow(provider_registry).to receive(:fetch).with('github').and_return(provider)
+    allow(provider).to receive(:plan).with(desired: desired, current: current).and_return(ok: false, status: 'error')
+
+    result = described_class.send(:enrich_change, change, provider_registry)
+
+    expect(result).to eq(change)
+  end
 end

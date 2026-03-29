@@ -55,7 +55,7 @@ module Umgr
         {
           ok: true,
           provider: 'github',
-          status: operations.empty? ? 'no_change' : 'planned',
+          status: 'planned',
           organization_action: organization_action,
           team_actions: team_actions,
           operations: operations
