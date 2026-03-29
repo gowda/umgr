@@ -123,6 +123,39 @@
     - [x] Library verification (RSpec)
     - [x] Pre-commit checks passed (rubocop + rspec + aruba)
     - [x] Commit created
+
+- [ ] Phase 12: DSL Assignment-Only Syntax
+  - [x] Task 12.1: Enforce DSL structure and scope
+    - [x] Require top-level `umgr` block
+    - [x] `version` must be assignment inside `umgr`
+    - [x] `resource` allowed only top-level
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
+  - [ ] Task 12.2: Replace resource syntax and remove legacy form
+    - [ ] Support only `resource 'provider.type', 'name' do ... end`
+    - [ ] Remove `resource provider:, type:, name:` support
+    - [ ] Validate `provider.type` format
+    - [ ] CLI verification (Aruba)
+    - [ ] Library verification (RSpec)
+    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [ ] Commit created
+  - [ ] Task 12.3: Assignment capture and attribute mapping
+    - [ ] Capture block local assignments (`team = 'platform'`) into `attributes`
+    - [ ] Merge behavior with explicit `attributes:` options
+    - [ ] Deterministic ordering preserved
+    - [ ] CLI verification (Aruba)
+    - [ ] Library verification (RSpec)
+    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [ ] Commit created
+  - [ ] Task 12.4: Docs and examples migration
+    - [ ] Update README + DSL docs to assignment-only syntax
+    - [ ] Add migration notes and error examples
+    - [ ] CLI verification (Aruba)
+    - [ ] Library verification (RSpec)
+    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [ ] Commit created
   - [x] Task 11.2: Add branching/looping-friendly DSL constructs for account lifecycles and provider matrices
     - [x] Support conditional inclusion and iteration helpers without changing final config schema
     - [x] Add deterministic ordering guarantees to avoid noisy diffs in generated config

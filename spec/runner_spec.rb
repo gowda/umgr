@@ -390,9 +390,10 @@ RSpec.describe Umgr::Runner do
         File.join(tmp_dir, 'umgr.rb'),
         <<~RUBY
           umgr do
-            version 1
-            resource provider: 'echo', type: 'user', name: 'alice', attributes: { team: 'platform' }
+            version = 1
           end
+
+          resource provider: 'echo', type: 'user', name: 'alice', attributes: { team: 'platform' }
         RUBY
       )
 
@@ -458,7 +459,7 @@ RSpec.describe Umgr::Runner do
 
   it 'raises validation error on auto-discovery ambiguity between DSL and static config' do
     Dir.mktmpdir do |tmp_dir|
-      File.write(File.join(tmp_dir, 'umgr.rb'), "umgr do\n  version 1\nend\n")
+      File.write(File.join(tmp_dir, 'umgr.rb'), "umgr do\n  version = 1\nend\n")
       File.write(File.join(tmp_dir, 'umgr.yml'), "version: 1\nresources: []\n")
 
       expect do
@@ -474,7 +475,7 @@ RSpec.describe Umgr::Runner do
 
   it 'raises validation error when only DSL source is present' do
     Dir.mktmpdir do |tmp_dir|
-      File.write(File.join(tmp_dir, 'umgr.rb'), "umgr do\n  version 1\nend\n")
+      File.write(File.join(tmp_dir, 'umgr.rb'), "umgr do\n  version = 1\nend\n")
 
       expect do
         Dir.chdir(tmp_dir) { runner.dispatch(:validate) }

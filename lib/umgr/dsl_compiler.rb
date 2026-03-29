@@ -36,17 +36,27 @@ module Umgr
     class Context < BasicObject
       def initialize
         @builder = Builder.new
+        @umgr_defined = false
+        @inside_umgr = false
       end
 
       def umgr(&)
-        instance_eval(&)
-      end
+        if @inside_umgr || @umgr_defined
+          ::Kernel.raise ::Umgr::Errors::ValidationError, 'Top-level `umgr` block can only be declared once'
+        end
 
-      def version(value)
-        builder.version(value)
+        @umgr_defined = true
+        @inside_umgr = true
+        apply_umgr_assignments(&)
+      ensure
+        @inside_umgr = false
       end
 
       def resource(provider:, type:, name:, **)
+        if @inside_umgr
+          ::Kernel.raise ::Umgr::Errors::ValidationError, '`resource` must be declared at top-level, outside `umgr`'
+        end
+
         builder.resource(provider: provider, type: type, name: name, **)
       end
 
@@ -73,7 +83,7 @@ module Umgr
       end
 
       def compiled_config
-        return unless builder.used?
+        ::Kernel.raise ::Umgr::Errors::ValidationError, 'Top-level `umgr` block is required' unless @umgr_defined
 
         builder.to_h
       end
@@ -81,6 +91,26 @@ module Umgr
       private
 
       attr_reader :builder
+
+      def apply_umgr_assignments(&block)
+        before = block.binding.local_variables
+        instance_eval(&block)
+        validate_umgr_assignments!(before, block)
+        return unless block.binding.local_variable_defined?(:version)
+
+        builder.version(block.binding.local_variable_get(:version))
+      end
+
+      def validate_umgr_assignments!(before, block)
+        assigned = block.binding.local_variables - before
+        invalid = assigned - [:version]
+        return if invalid.empty?
+
+        ::Kernel.raise(
+          ::Umgr::Errors::ValidationError,
+          "Unsupported `umgr` assignment(s): #{invalid.join(', ')}"
+        )
+      end
 
       def emit_matrix_resources(provider, type, accounts, shared_options)
         accounts.each do |entry|
@@ -115,8 +145,8 @@ module Umgr
       def method_missing(name, *_args, &)
         ::Kernel.raise(
           ::Umgr::Errors::ValidationError,
-          "Unsupported DSL method `#{name}`. Allowed: umgr, version, resource, resources, " \
-          'if_enabled, for_each, provider_matrix.'
+          "Unsupported DSL method `#{name}`. Allowed methods: umgr, resource, resources, " \
+          'if_enabled, for_each, provider_matrix. Set config with assignment in `umgr` (for example, `version = 1`).'
         )
       end
 
