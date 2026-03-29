@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Provider authoring guide for umgr providers/plugins.">
+    <title>umgr Provider Authoring Guide</title>
+    <link rel="stylesheet" href="assets/site.css">
+  </head>
+  <body>
+    <div class="page">
+      <header class="hero">
+        <p class="kicker">umgr</p>
+        <h1>Provider Authoring Guide</h1>
+        <p class="lead">
+          Build platform adapters that validate desired account state, import current
+          users, plan drift changes, and apply reconciliation safely.
+        </p>
+      </header>
+
+      <main>
+        <section>
+          <h2>Provider Responsibilities</h2>
+          <p>A provider must implement four methods:</p>
+          <ul>
+            <li><code>validate(resource:)</code></li>
+            <li><code>current(resource:)</code></li>
+            <li><code>plan(desired:, current:)</code></li>
+            <li><code>apply(changeset:)</code></li>
+          </ul>
+          <p>
+            See implementation contract in
+            <a href="../lib/umgr/provider.rb"><code>lib/umgr/provider.rb</code></a>.
+          </p>
+        </section>
+
+        <section>
+          <h2>Validation Contract</h2>
+          <ul>
+            <li>Preferred: raise <code>Umgr::Errors::ValidationError</code>.</li>
+            <li>
+              Also supported: return <code>{ ok: false }</code> (symbol or string keys);
+              <code>umgr</code> promotes it to a validation error.
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Current State Contract (Import)</h2>
+          <p>Supported <code>current(resource:)</code> success response shapes:</p>
+          <ul>
+            <li>Recommended: <code>{ ok: true, imported_accounts: [resource_hash, ...] }</code></li>
+            <li>Also supported: <code>{ ok: true, resource: resource_hash }</code></li>
+            <li>
+              Also supported: <code>{ ok: true, account: account_hash }</code> where
+              <code>account</code> is a hash mapped into <code>attributes</code>
+            </li>
+          </ul>
+          <p>
+            Failure shape: <code>{ ok: false, error: "..." }</code> (symbol or string keys).
+          </p>
+        </section>
+
+        <section>
+          <h2>Contract Enforcement</h2>
+          <p>
+            Registration is validated by
+            <a href="../lib/umgr/provider_contract.rb"><code>Umgr::ProviderContract</code></a>:
+          </p>
+          <ul>
+            <li>Provider object must respond to required methods.</li>
+            <li>Methods must be concrete (not inherited abstract implementations).</li>
+            <li>Failures raise <code>Umgr::Errors::ProviderContractError</code>.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Registry and Naming</h2>
+          <ul>
+            <li>Register via <code>register(name, provider_instance)</code>.</li>
+            <li>Name is normalized to symbol (for example, <code>"echo" -> :echo</code>).</li>
+            <li>Empty names raise <code>Umgr::Errors::ProviderContractError</code>.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Resource Shape</h2>
+          <p>Required resource keys:</p>
+          <ul>
+            <li><code>provider</code></li>
+            <li><code>type</code></li>
+            <li><code>name</code></li>
+          </ul>
+          <p>Canonical identity is <code>provider.type.name</code>.</p>
+          <p>Provider code should read deep-symbolized keys as symbols.</p>
+        </section>
+
+        <section>
+          <h2>Runtime Flow</h2>
+          <ol>
+            <li>Runner resolves config path (explicit <code>--config</code> or auto-discovery).</li>
+            <li>Config is schema-validated.</li>
+            <li>Unknown providers are rejected early.</li>
+            <li>Action execution uses providers from the registry.</li>
+          </ol>
+        </section>
+
+        <section>
+          <h2>Minimal Provider Example</h2>
+          <pre><code># lib/umgr/providers/acme_provider.rb
+# frozen_string_literal: true
+
+module Umgr
+  module Providers
+    class AcmeProvider &lt; Provider
+      def validate(resource:)
+        { ok: true, provider: "acme", resource: resource }
+      end
+
+      def current(resource:)
+        account = { email: resource.dig(:attributes, :email) }
+        { ok: true, provider: "acme", account: account }
+      end
+
+      def plan(desired:, current:)
+        status = desired == current ? "no_change" : "update"
+        { ok: true, provider: "acme", status: status, desired: desired, current: current }
+      end
+
+      def apply(changeset:)
+        { ok: true, provider: "acme", status: "applied", changeset: changeset }
+      end
+    end
+  end
+end</code></pre>
+        </section>
+
+        <section>
+          <h2>Registering a Provider</h2>
+          <pre><code>require "umgr"
+require "umgr/providers/acme_provider"
+
+registry = Umgr::ProviderRegistry.new
+registry.register(:acme, Umgr::Providers::AcmeProvider.new)
+
+runner = Umgr::Runner.new(provider_registry: registry)
+result = runner.dispatch(:validate, config: "users.yml")</code></pre>
+        </section>
+
+        <section>
+          <h2>Error Behavior</h2>
+          <ul>
+            <li><code>Umgr::Errors::ValidationError</code> for invalid input/config.</li>
+            <li><code>Umgr::Errors::ProviderContractError</code> for bad provider contracts.</li>
+            <li><code>Umgr::Errors::InternalError</code> for unexpected runtime issues.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Testing Guidance</h2>
+          <ul>
+            <li>Library coverage with RSpec for provider method branches.</li>
+            <li>CLI coverage with Aruba for command/exit behavior.</li>
+          </ul>
+          <pre><code>bundle exec rubocop
+bundle exec rspec --exclude-pattern "spec/cli/**/*_spec.rb"
+bundle exec rspec spec/cli</code></pre>
+        </section>
+
+        <section>
+          <h2>Reference Provider</h2>
+          <p>Use echo provider as a starting point:</p>
+          <ul>
+            <li><a href="../lib/umgr/providers/echo_provider.rb"><code>lib/umgr/providers/echo_provider.rb</code></a></li>
+            <li><a href="../spec/providers/echo_provider_spec.rb"><code>spec/providers/echo_provider_spec.rb</code></a></li>
+          </ul>
+          <p><a href="index.html">Back to website home</a></p>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

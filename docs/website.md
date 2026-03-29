@@ -5,6 +5,7 @@ The `umgr` website is a static GitHub Pages site served directly from `docs/`.
 ## Files
 
 - `docs/index.html`: single-page site content
+- `docs/provider-authoring.html`: provider guide page linked from the site
 - `docs/assets/site.css`: site styles
 
 ## Local Preview
