@@ -102,10 +102,19 @@ module Umgr
         users = api_client.list_org_users(org: org, token: token)
         memberships = api_client.list_org_team_memberships(org: org, token: token)
         users.map do |user|
-          login = user.fetch('login')
+          login = fetch_login(user)
           teams = memberships.fetch(login, [])
           GithubAccountNormalizer.call(user: user, org: org, teams: teams)
         end
+      end
+
+      def fetch_login(user)
+        login = user[:login] if user.respond_to?(:[])
+        login ||= user['login'] if user.respond_to?(:[])
+        login ||= user.login if user.respond_to?(:login)
+        return login if present_string?(login)
+
+        raise Errors::ApiError, 'GitHub API response missing user login'
       end
     end
   end
