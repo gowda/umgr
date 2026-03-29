@@ -20,7 +20,11 @@ module Umgr
 
     def build_result(options:, state_backend:, current_state:, changeset:)
       result = { ok: true, action: 'plan', status: 'planned', options: options, state_path: state_backend.path }
-      result.merge(current_state: current_state, changeset: changeset)
+      result.merge(
+        current_state: current_state,
+        changeset: changeset,
+        drift: DriftReportBuilder.call(changeset.fetch(:summary))
+      )
     end
   end
 end
