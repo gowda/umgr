@@ -10,7 +10,9 @@ module Umgr
       apply_results = apply_changes(plan_result.fetch(:changeset).fetch(:changes), provider_registry)
       final_state = build_final_state(desired_state)
       state_backend.write(final_state)
-      build_result(options, state_backend, plan_result, final_state, apply_results)
+      idempotency = verify_idempotency(state_backend, options, provider_registry)
+      payload = result_payload(plan_result, apply_results, idempotency)
+      build_result(options: options, state_backend: state_backend, final_state: final_state, payload: payload)
     end
 
     def apply_changes(changes, provider_registry)
@@ -77,11 +79,30 @@ module Umgr
       }
     end
 
-    def build_result(options, state_backend, plan_result, final_state, apply_results)
-      base_result(options, state_backend, final_state).merge(
+    def verify_idempotency(state_backend, options, provider_registry)
+      post_apply_plan = plan_result_for(state_backend, options, provider_registry)
+      summary = post_apply_plan.fetch(:changeset).fetch(:summary)
+      return { checked: true, stable: true, summary: summary } if idempotent_summary?(summary)
+
+      raise Errors::InternalError, "Apply is not idempotent; pending changes remain: #{summary}"
+    end
+
+    def idempotent_summary?(summary)
+      summary.fetch(:create).zero? && summary.fetch(:update).zero? && summary.fetch(:delete).zero?
+    end
+
+    def result_payload(plan_result, apply_results, idempotency)
+      {
         changeset: plan_result.fetch(:changeset),
         drift: plan_result.fetch(:drift),
-        apply_results: apply_results
+        apply_results: apply_results,
+        idempotency: idempotency
+      }
+    end
+
+    def build_result(options:, state_backend:, final_state:, payload:)
+      base_result(options, state_backend, final_state).merge(
+        payload
       )
     end
 
