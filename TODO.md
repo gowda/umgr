@@ -2,48 +2,273 @@
 
 - [x] Phase 0: README Bootstrap
   - [x] Task 0.1: Create brief README.md with motivation, interfaces, config/state model, and non-exhaustive provider examples
+    <details>
+    <summary>Checklist</summary>
 
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks waived by user exception (2026-03-28)
+    - [x] Commit created
+
+    </details>
 - [x] Phase 1: Foundation + Shared Runtime
   - [x] Task 1.1: Scaffold gem, executable, Thor CLI wiring, RSpec/Aruba setup, RuboCop + rubocop-performance config
-  - [x] Task 1.2: Implement shared CLI->Runner command dispatch for init, validate, plan, apply, show, and import
-  - [x] Task 1.3: Implement unified errors and CLI exit-code mapping
-  - [x] Task 1.4: Add Dependabot config for bundler and github-actions with ecosystem-specific grouping
-  - [x] Task 1.5: Add explicit permissions block to checks workflow
-  - [x] Task 1.6: Add coverage tracking in checks workflow
+    <details>
+    <summary>Checklist</summary>
 
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
+    </details>
+  - [x] Task 1.2: Implement shared CLI->Runner command dispatch for init, validate, plan, apply, show, and import
+    <details>
+    <summary>Checklist</summary>
+
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
+    </details>
+  - [x] Task 1.3: Implement unified errors and CLI exit-code mapping
+    <details>
+    <summary>Checklist</summary>
+
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
+    </details>
+  - [x] Task 1.4: Add Dependabot config for bundler and github-actions with ecosystem-specific grouping
+    <details>
+    <summary>Checklist</summary>
+
+    - [x] Configure `.github/dependabot.yml` for `bundler` and `github-actions` ecosystems
+    - [x] Define grouping rules for each ecosystem
+    - [x] Ensure update policy is backward compatible for this gem's own major/minor release line
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
+    </details>
+  - [x] Task 1.5: Add explicit permissions block to checks workflow
+    <details>
+    <summary>Checklist</summary>
+
+    - [x] Add top-level workflow permissions for least-privilege defaults
+    - [x] Run required checks including actionlint
+    - [x] Commit created
+    </details>
+  - [x] Task 1.6: Add coverage tracking in checks workflow
+    <details>
+    <summary>Checklist</summary>
+
+    - [x] Integrate `simplecov` for test coverage reporting
+    - [x] Publish per-job coverage in step summary
+    - [x] Upload coverage HTML/data artifacts from CI jobs
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
+
+    </details>
 - [x] Phase 2: Config + Validation
   - [x] Task 2.1: Support YAML/JSON config auto-discovery and --config override
-  - [x] Task 2.2: Enforce core schema validation (provider/type/name and top-level shape)
-  - [x] Task 2.3: Preserve hybrid payload fields (attributes + provider-specific options)
+    <details>
+    <summary>Checklist</summary>
 
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
+    </details>
+  - [x] Task 2.2: Enforce core schema validation (provider/type/name and top-level shape)
+    <details>
+    <summary>Checklist</summary>
+
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
+    </details>
+  - [x] Task 2.3: Preserve hybrid payload fields (attributes + provider-specific options)
+    <details>
+    <summary>Checklist</summary>
+
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
+
+    </details>
 - [x] Phase 3: State Backend + Visibility
   - [x] Task 3.1: Implement local state backend (.umgr/state.json) with atomic writes
-  - [x] Task 3.2: Implement init command/API for state initialization
-  - [x] Task 3.3: Implement show command/API for state inspection
+    <details>
+    <summary>Checklist</summary>
 
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
+    </details>
+  - [x] Task 3.2: Implement init command/API for state initialization
+    <details>
+    <summary>Checklist</summary>
+
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
+    </details>
+  - [x] Task 3.3: Implement show command/API for state inspection
+    <details>
+    <summary>Checklist</summary>
+
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
+
+    </details>
 - [x] Phase 4: Provider Framework + Echo Provider
   - [x] Task 4.1: Define provider interface contract (validate/current/plan/apply) and registry
-  - [x] Task 4.2: Implement unknown-provider handling in validation/runtime flows
-  - [x] Task 4.3: Implement built-in echo test provider that echoes fake user account attributes
+    <details>
+    <summary>Checklist</summary>
 
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
+    </details>
+  - [x] Task 4.2: Implement unknown-provider handling in validation/runtime flows
+    <details>
+    <summary>Checklist</summary>
+
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
+    </details>
+  - [x] Task 4.3: Implement built-in echo test provider that echoes fake user account attributes
+    <details>
+    <summary>Checklist</summary>
+
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
+
+    </details>
 - [x] Phase 5: Provider Authoring Documentation
   - [x] Task 5.1: Add detailed provider/plugin authoring guide in separate markdown file after first provider implementation
-  - [x] Task 5.2: Update README.md to point to provider authoring guide
+    <details>
+    <summary>Checklist</summary>
 
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
+    </details>
+  - [x] Task 5.2: Update README.md to point to provider authoring guide
+    <details>
+    <summary>Checklist</summary>
+
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
+
+    </details>
 - [x] Phase 6: Planning Engine
   - [x] Task 6.1: Implement canonical resource identity (provider.type.name)
-  - [x] Task 6.2: Implement desired-vs-current diff and change-set generation
-  - [x] Task 6.3: Implement plan outputs (human default + --json)
-  - [x] Task 6.4: Implement explicit drift detection reporting in plan output and API results
+    <details>
+    <summary>Checklist</summary>
 
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
+    </details>
+  - [x] Task 6.2: Implement desired-vs-current diff and change-set generation
+    <details>
+    <summary>Checklist</summary>
+
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
+    </details>
+  - [x] Task 6.3: Implement plan outputs (human default + --json)
+    <details>
+    <summary>Checklist</summary>
+
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
+    </details>
+  - [x] Task 6.4: Implement explicit drift detection reporting in plan output and API results
+    <details>
+    <summary>Checklist</summary>
+
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
+
+    </details>
 - [x] Phase 7: First Concrete Provider (GitHub)
   - [x] Task 7.1: Implement GitHub provider scaffold and registration
-  - [x] Task 7.2: Implement GitHub import/current state retrieval
-  - [x] Task 7.3: Implement GitHub drift planning for org + team membership
-  - [x] Task 7.4: Implement GitHub apply execution for membership reconciliation
+    <details>
+    <summary>Checklist</summary>
 
+    - [x] Add `github` provider class with contract methods (validate/current/plan/apply)
+    - [x] Add provider-specific configuration contract (org, auth token/env, team mapping inputs)
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
+    </details>
+  - [x] Task 7.2: Implement GitHub import/current state retrieval
+    <details>
+    <summary>Checklist</summary>
+
+    - [x] Import org users and team membership snapshots through GitHub API
+    - [x] Normalize imported state into canonical identities (`github.user.<login>`)
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
+    </details>
+  - [x] Task 7.3: Implement GitHub drift planning for org + team membership
+    <details>
+    <summary>Checklist</summary>
+
+    - [x] Detect invite/add/remove/no-change actions from desired vs current state
+    - [x] Include provider-specific plan details in structured output
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
+    </details>
+  - [x] Task 7.4: Implement GitHub apply execution for membership reconciliation
+    <details>
+    <summary>Checklist</summary>
+
+    - [x] Apply org invitations and team membership updates safely
+    - [x] Persist resulting state and preserve idempotency guarantees
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
+
+    </details>
 - [ ] Phase 8: Apply Engine
   - [x] Task 8.1: Implement apply execution and state persistence
+    <details>
+    <summary>Checklist</summary>
+
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
+    </details>
   - [ ] Task 8.2: Implement idempotency checks (apply then plan yields no changes)
     - [ ] CLI verification (Aruba)
     - [ ] Library verification (RSpec)
