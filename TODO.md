@@ -33,6 +33,12 @@
     - [x] Add top-level workflow permissions for least-privilege defaults
     - [x] Run required checks including actionlint
     - [x] Commit created
+  - [x] Task 1.6: Add coverage tracking in checks workflow
+    - [x] Integrate `simplecov` for test coverage reporting
+    - [x] Publish per-job coverage in step summary
+    - [x] Upload coverage HTML/data artifacts from CI jobs
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
 
 - [x] Phase 2: Config + Validation
   - [x] Task 2.1: Support YAML/JSON config auto-discovery and --config override

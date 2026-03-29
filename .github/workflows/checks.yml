@@ -35,7 +35,20 @@ jobs:
           ruby-version: '3.4'
           bundler-cache: true
       - name: RSpec library checks
+        env:
+          SIMPLECOV_COMMAND_NAME: rspec-library
         run: bundle exec rspec --exclude-pattern "spec/cli/**/*_spec.rb"
+      - name: Coverage summary (library)
+        if: always()
+        env:
+          COVERAGE_SECTION: Library Coverage
+        run: ruby scripts/ci/coverage_summary.rb coverage/.last_run.json
+      - name: Upload coverage artifact (library)
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: coverage-library
+          path: coverage/
 
   cli-checks:
     runs-on: ubuntu-latest
@@ -49,4 +62,17 @@ jobs:
           ruby-version: '3.4'
           bundler-cache: true
       - name: RSpec CLI checks
+        env:
+          SIMPLECOV_COMMAND_NAME: rspec-cli
         run: bundle exec rspec spec/cli
+      - name: Coverage summary (cli)
+        if: always()
+        env:
+          COVERAGE_SECTION: CLI Coverage
+        run: ruby scripts/ci/coverage_summary.rb coverage/.last_run.json
+      - name: Upload coverage artifact (cli)
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: coverage-cli
+          path: coverage/
