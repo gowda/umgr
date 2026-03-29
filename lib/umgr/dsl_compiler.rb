@@ -33,7 +33,7 @@ module Umgr
       context.compiled_config || result
     end
 
-    class Context
+    class Context < BasicObject
       def initialize
         @builder = Builder.new
       end
@@ -101,15 +101,27 @@ module Umgr
       end
 
       def normalize_account_entry(entry)
-        return { 'name' => entry.to_s } unless entry.is_a?(Hash)
+        return { 'name' => entry.to_s } unless entry.is_a?(::Hash)
 
         normalized = entry.transform_keys(&:to_s)
         name = normalized['name']
-        if !name.is_a?(String) || name.empty?
-          raise Errors::ValidationError, 'provider_matrix account requires non-empty `name`'
+        if !name.is_a?(::String) || name.empty?
+          ::Kernel.raise ::Umgr::Errors::ValidationError, 'provider_matrix account requires non-empty `name`'
         end
 
         normalized
+      end
+
+      def method_missing(name, *_args, &)
+        ::Kernel.raise(
+          ::Umgr::Errors::ValidationError,
+          "Unsupported DSL method `#{name}`. Allowed: umgr, version, resource, resources, " \
+          'if_enabled, for_each, provider_matrix.'
+        )
+      end
+
+      def respond_to_missing?(_name, _include_private = false)
+        false
       end
     end
 

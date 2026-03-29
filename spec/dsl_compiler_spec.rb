@@ -161,4 +161,23 @@ RSpec.describe Umgr::DslCompiler do
       end.to raise_error(Umgr::Errors::ValidationError, /provider_matrix account requires non-empty `name`/)
     end
   end
+
+  it 'raises validation error for unsupported DSL methods' do
+    Dir.mktmpdir do |tmp_dir|
+      dsl_path = File.join(tmp_dir, 'umgr.rb')
+      File.write(
+        dsl_path,
+        <<~RUBY
+          umgr do
+            version 1
+            system('echo should-not-run')
+          end
+        RUBY
+      )
+
+      expect do
+        described_class.compile_file(dsl_path)
+      end.to raise_error(Umgr::Errors::ValidationError, /Unsupported DSL method `system`/)
+    end
+  end
 end
