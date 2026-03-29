@@ -46,7 +46,7 @@ RSpec.describe Umgr::Providers::GithubProvider do
   end
 
   it 'imports current users and team memberships into canonical resources' do
-    stub_request(:get, %r{\Ahttps://api.github.com/orgs/acme/members(\?.*)?\z}).to_return(
+    stub_request(:get, %r{\Ahttps://api\.github\.com/orgs/acme/members(\?.*)?\z}).to_return(
       status: 200,
       body: JSON.generate(
         [
@@ -61,17 +61,17 @@ RSpec.describe Umgr::Providers::GithubProvider do
       ),
       headers: { 'Content-Type' => 'application/json' }
     )
-    stub_request(:get, %r{\Ahttps://api.github.com/orgs/acme/teams(\?.*)?\z}).to_return(
+    stub_request(:get, %r{\Ahttps://api\.github\.com/orgs/acme/teams(\?.*)?\z}).to_return(
       status: 200,
       body: JSON.generate([{ id: 101, slug: 'platform' }, { id: 102, slug: 'admins' }]),
       headers: { 'Content-Type' => 'application/json' }
     )
-    stub_request(:get, %r{\Ahttps://api.github.com/teams/101/members(\?.*)?\z}).to_return(
+    stub_request(:get, %r{\Ahttps://api\.github\.com/teams/101/members(\?.*)?\z}).to_return(
       status: 200,
       body: JSON.generate([{ login: 'alice' }]),
       headers: { 'Content-Type' => 'application/json' }
     )
-    stub_request(:get, %r{\Ahttps://api.github.com/teams/102/members(\?.*)?\z}).to_return(
+    stub_request(:get, %r{\Ahttps://api\.github\.com/teams/102/members(\?.*)?\z}).to_return(
       status: 200,
       body: JSON.generate([{ login: 'alice' }]),
       headers: { 'Content-Type' => 'application/json' }
@@ -105,7 +105,7 @@ RSpec.describe Umgr::Providers::GithubProvider do
   end
 
   it 'raises api error when github api fails' do
-    stub_request(:get, %r{\Ahttps://api.github.com/orgs/acme/members(\?.*)?\z}).to_return(
+    stub_request(:get, %r{\Ahttps://api\.github\.com/orgs/acme/members(\?.*)?\z}).to_return(
       status: 401,
       body: JSON.generate(message: 'Bad credentials'),
       headers: { 'Content-Type' => 'application/json' }
@@ -118,12 +118,12 @@ RSpec.describe Umgr::Providers::GithubProvider do
   it 'uses token_env when token is not provided' do
     allow(ENV).to receive(:fetch).and_call_original
     allow(ENV).to receive(:fetch).with('GITHUB_TOKEN', nil).and_return('from-env')
-    stub_request(:get, %r{\Ahttps://api.github.com/orgs/acme/members(\?.*)?\z}).to_return(
+    stub_request(:get, %r{\Ahttps://api\.github\.com/orgs/acme/members(\?.*)?\z}).to_return(
       status: 200,
       body: JSON.generate([]),
       headers: { 'Content-Type' => 'application/json' }
     )
-    stub_request(:get, %r{\Ahttps://api.github.com/orgs/acme/teams(\?.*)?\z}).to_return(
+    stub_request(:get, %r{\Ahttps://api\.github\.com/orgs/acme/teams(\?.*)?\z}).to_return(
       status: 200,
       body: JSON.generate([]),
       headers: { 'Content-Type' => 'application/json' }

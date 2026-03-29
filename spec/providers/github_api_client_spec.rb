@@ -6,7 +6,7 @@ RSpec.describe Umgr::Providers::GithubApiClient do
   subject(:client) { described_class.new }
 
   it 'paginates org users with link headers' do
-    stub_request(:get, %r{\Ahttps://api.github.com/orgs/acme/members(\?.*)?\z}).to_return(
+    stub_request(:get, %r{\Ahttps://api\.github\.com/orgs/acme/members(\?.*)?\z}).to_return(
       status: 200,
       body: JSON.generate([{ login: 'alice' }]),
       headers: {
@@ -26,17 +26,17 @@ RSpec.describe Umgr::Providers::GithubApiClient do
   end
 
   it 'builds team memberships map from org teams and members endpoints' do
-    stub_request(:get, %r{\Ahttps://api.github.com/orgs/acme/teams(\?.*)?\z}).to_return(
+    stub_request(:get, %r{\Ahttps://api\.github\.com/orgs/acme/teams(\?.*)?\z}).to_return(
       status: 200,
       body: JSON.generate([{ id: 101, slug: 'platform' }, { id: 102, slug: 'admins' }]),
       headers: { 'Content-Type' => 'application/json' }
     )
-    stub_request(:get, %r{\Ahttps://api.github.com/teams/101/members(\?.*)?\z}).to_return(
+    stub_request(:get, %r{\Ahttps://api\.github\.com/teams/101/members(\?.*)?\z}).to_return(
       status: 200,
       body: JSON.generate([{ login: 'alice' }, { login: 'bob' }]),
       headers: { 'Content-Type' => 'application/json' }
     )
-    stub_request(:get, %r{\Ahttps://api.github.com/teams/102/members(\?.*)?\z}).to_return(
+    stub_request(:get, %r{\Ahttps://api\.github\.com/teams/102/members(\?.*)?\z}).to_return(
       status: 200,
       body: JSON.generate([{ login: 'alice' }]),
       headers: { 'Content-Type' => 'application/json' }
@@ -51,7 +51,7 @@ RSpec.describe Umgr::Providers::GithubApiClient do
   end
 
   it 'raises api error on non-success responses' do
-    stub_request(:get, %r{\Ahttps://api.github.com/orgs/acme/members(\?.*)?\z}).to_return(
+    stub_request(:get, %r{\Ahttps://api\.github\.com/orgs/acme/members(\?.*)?\z}).to_return(
       status: 500,
       body: JSON.generate(message: 'internal error'),
       headers: { 'Content-Type' => 'application/json' }
