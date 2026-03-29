@@ -229,4 +229,23 @@ RSpec.describe Umgr::DslCompiler do
       end.to raise_error(Umgr::Errors::ValidationError, /Unsupported DSL method `version`/)
     end
   end
+
+  it 'raises validation error for unsupported assignment inside umgr block' do
+    Dir.mktmpdir do |tmp_dir|
+      dsl_path = File.join(tmp_dir, 'umgr.rb')
+      File.write(
+        dsl_path,
+        <<~RUBY
+          umgr do
+            version = 1
+            foo = 'bar'
+          end
+        RUBY
+      )
+
+      expect do
+        described_class.compile_file(dsl_path)
+      end.to raise_error(Umgr::Errors::ValidationError, /Unsupported.*assignment/)
+    end
+  end
 end

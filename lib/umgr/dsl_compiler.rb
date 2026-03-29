@@ -28,16 +28,19 @@ module Umgr
     attr_reader :path
 
     def compiled_config_from_source(source)
-      context = Context.new
+      context = Context.new(source:)
       result = context.instance_eval(source, path, 1)
       context.compiled_config || result
     end
 
     class Context < BasicObject
-      def initialize
+      ASSIGNMENT_LINE_PATTERN = /^\s*([a-z_]\w*)\s*=/.freeze
+
+      def initialize(source:)
         @builder = Builder.new
         @umgr_defined = false
         @inside_umgr = false
+        @source_lines = source.lines
       end
 
       def umgr(&)
@@ -93,23 +96,56 @@ module Umgr
       attr_reader :builder
 
       def apply_umgr_assignments(&block)
-        before = block.binding.local_variables
+        assignment_names = umgr_assignment_names_for(block)
         instance_eval(&block)
-        validate_umgr_assignments!(before, block)
+        validate_umgr_assignments!(assignment_names)
         return unless block.binding.local_variable_defined?(:version)
 
         builder.version(block.binding.local_variable_get(:version))
       end
 
-      def validate_umgr_assignments!(before, block)
-        assigned = block.binding.local_variables - before
-        invalid = assigned - [:version]
+      def validate_umgr_assignments!(assignment_names)
+        invalid = assignment_names - [:version]
         return if invalid.empty?
 
         ::Kernel.raise(
           ::Umgr::Errors::ValidationError,
           "Unsupported `umgr` assignment(s): #{invalid.join(', ')}"
         )
+      end
+
+      def umgr_assignment_names_for(block)
+        start_index = block.source_location.fetch(1) - 1
+        body_lines = extract_umgr_block_lines(start_index)
+        body_lines.filter_map do |line|
+          match = line.match(ASSIGNMENT_LINE_PATTERN)
+          match && match[1].to_sym
+        end.uniq
+      end
+
+      def extract_umgr_block_lines(start_index)
+        line = @source_lines.fetch(start_index, '')
+        if line.include?('{')
+          return [line[/\{(.*)\}/, 1]].compact
+        end
+
+        lines = []
+        depth = 1
+        index = start_index + 1
+
+        while depth.positive? && index < @source_lines.length
+          current = @source_lines[index]
+          stripped = current.strip
+
+          depth -= 1 if stripped == 'end'
+          break if depth.zero?
+
+          lines << current
+          depth += 1 if stripped.end_with?(' do')
+          index += 1
+        end
+
+        lines
       end
 
       def emit_matrix_resources(provider, type, accounts, shared_options)
