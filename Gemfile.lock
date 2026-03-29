@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    umgr (0.1.0)
+    umgr (0.1.1)
       faraday-retry (~> 2.3)
       octokit (~> 9.2)
       thor (~> 1.3)
