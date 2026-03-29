@@ -22,6 +22,10 @@ module Umgr
       EXIT_CODE = 70
     end
 
+    class ApiError < Error
+      EXIT_CODE = InternalError::EXIT_CODE
+    end
+
     class AbstractMethodError < Error
     end
 

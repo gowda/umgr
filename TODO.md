@@ -133,13 +133,13 @@
     - [x] Library verification (RSpec)
     - [x] Pre-commit checks passed (rubocop + rspec + aruba)
     - [x] Commit created
-  - [ ] Task 7.2: Implement GitHub import/current state retrieval
-    - [ ] Import org users and team membership snapshots through GitHub API
-    - [ ] Normalize imported state into canonical identities (`github.user.<login>`)
-    - [ ] CLI verification (Aruba)
-    - [ ] Library verification (RSpec)
-    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [ ] Commit created
+  - [x] Task 7.2: Implement GitHub import/current state retrieval
+    - [x] Import org users and team membership snapshots through GitHub API
+    - [x] Normalize imported state into canonical identities (`github.user.<login>`)
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
   - [ ] Task 7.3: Implement GitHub drift planning for org + team membership
     - [ ] Detect invite/add/remove/no-change actions from desired vs current state
     - [ ] Include provider-specific plan details in structured output

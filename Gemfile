@@ -8,4 +8,5 @@ group :development, :test do
   gem 'rubocop', require: false
   gem 'rubocop-performance', require: false
   gem 'simplecov', require: false
+  gem 'webmock'
 end
