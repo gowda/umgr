@@ -193,6 +193,16 @@
     - [ ] Library verification (RSpec)
     - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
     - [ ] Commit created
+  - [ ] Task 9.4: Add static GitHub Pages website for umgr (single-page, precise/exhaustive, no bloat)
+    - [ ] Create static `docs/index.html` + minimal CSS assets (no Jekyll generation pipeline)
+    - [ ] Ensure content includes accurate code samples for CLI and Gemfile usage
+    - [ ] Configure GitHub Pages deployment workflow for static `docs/` content
+    - [ ] Document local preview/edit workflow for website content
+    - [ ] Mark as required prerequisite before private package publishing work begins
+    - [ ] CLI verification (Aruba)
+    - [ ] Library verification (RSpec)
+    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [ ] Commit created
 
 - [ ] Phase 10: Release + Distribution
   - [ ] Task 10.1: Add private publish workflow for GitHub Packages triggered by GitHub Release publish event
