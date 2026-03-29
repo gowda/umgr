@@ -5,8 +5,8 @@ require_relative 'lib/umgr/version'
 Gem::Specification.new do |spec|
   spec.name = 'umgr'
   spec.version = Umgr::VERSION
-  spec.authors = ['umgr contributors']
-  spec.email = ['devnull@example.com']
+  spec.authors = ['Basavanagowda Kanur']
+  spec.email = ['basavanagowda@gmail.com']
 
   spec.summary = 'Declarative account lifecycle management'
   spec.description = 'Manage account state across providers via CLI and API'
