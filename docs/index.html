@@ -48,6 +48,138 @@ umgr apply --config users.yml
 umgr show</code></pre>
         </section>
 
+        <section aria-labelledby="dsl-compile">
+          <h2 id="dsl-compile">DSL compile workflow</h2>
+          <pre><code>umgr compile > umgr.yml
+umgr validate --config umgr.yml
+umgr plan --config umgr.yml
+umgr apply --config umgr.yml
+umgr import --config umgr.yml</code></pre>
+          <pre><code>umgr compile | umgr plan --config -
+umgr compile | umgr apply --config -</code></pre>
+        </section>
+
+        <section aria-labelledby="configs">
+          <h2 id="configs">Exhaustive configuration examples</h2>
+          <p>These examples represent the same desired state in each supported format.</p>
+
+          <div class="code-card">
+            <div class="code-title">
+              <span>umgr.rb</span>
+              <button type="button" class="copy-btn" data-copy-target="config-rb">Copy</button>
+            </div>
+            <pre><code id="config-rb">umgr do
+  version = 1
+end
+
+resource "echo.user", "alice", attributes: { location: "us" } do
+  team = "platform"
+  role = "admin"
+end
+
+resource "github.user", "bob" do
+  org = "acme"
+  teams = ["platform", "security"]
+end</code></pre>
+          </div>
+
+          <div class="code-card">
+            <div class="code-title">
+              <span>umgr.yml</span>
+              <button type="button" class="copy-btn" data-copy-target="config-yml">Copy</button>
+            </div>
+            <pre><code id="config-yml">version: 1
+resources:
+  - provider: echo
+    type: user
+    name: alice
+    attributes:
+      location: us
+      role: admin
+      team: platform
+  - provider: github
+    type: user
+    name: bob
+    attributes:
+      org: acme
+      teams:
+        - platform
+        - security</code></pre>
+          </div>
+
+          <div class="code-card">
+            <div class="code-title">
+              <span>umgr.yaml</span>
+              <button type="button" class="copy-btn" data-copy-target="config-yaml">Copy</button>
+            </div>
+            <pre><code id="config-yaml">version: 1
+resources:
+  - provider: echo
+    type: user
+    name: alice
+    attributes:
+      location: us
+      role: admin
+      team: platform
+  - provider: github
+    type: user
+    name: bob
+    attributes:
+      org: acme
+      teams:
+        - platform
+        - security</code></pre>
+          </div>
+
+          <div class="code-card">
+            <div class="code-title">
+              <span>umgr.json</span>
+              <button type="button" class="copy-btn" data-copy-target="config-json">Copy</button>
+            </div>
+            <pre><code id="config-json">{
+  "version": 1,
+  "resources": [
+    {
+      "provider": "echo",
+      "type": "user",
+      "name": "alice",
+      "attributes": {
+        "location": "us",
+        "role": "admin",
+        "team": "platform"
+      }
+    },
+    {
+      "provider": "github",
+      "type": "user",
+      "name": "bob",
+      "attributes": {
+        "org": "acme",
+        "teams": [
+          "platform",
+          "security"
+        ]
+      }
+    }
+  ]
+}</code></pre>
+          </div>
+        </section>
+
+        <section aria-labelledby="precedence">
+          <h2 id="precedence">Runtime config precedence</h2>
+          <ol>
+            <li><code>--config &lt;path&gt;</code>: use the explicit config file.</li>
+            <li><code>--config -</code>: read config from stdin.</li>
+            <li>No <code>--config</code>: auto-discover <code>umgr.yml</code>, then <code>umgr.yaml</code>, then <code>umgr.json</code>.</li>
+          </ol>
+          <p>
+            If <code>umgr.rb</code> and a static config file are both present with no
+            explicit <code>--config</code>, <code>umgr</code> fails fast and asks you
+            to use <code>--config</code> or compile pipeline mode.
+          </p>
+        </section>
+
         <section aria-labelledby="library-quickstart">
           <h2 id="library-quickstart">Gemfile and Ruby API</h2>
           <pre><code># Gemfile
@@ -75,5 +207,31 @@ puts apply[:status]</code></pre>
         </section>
       </main>
     </div>
+    <script>
+      (() => {
+        const buttons = document.querySelectorAll(".copy-btn");
+        buttons.forEach((button) => {
+          button.addEventListener("click", async () => {
+            const targetId = button.getAttribute("data-copy-target");
+            const node = document.getElementById(targetId);
+            if (!node) return;
+            const text = node.textContent || "";
+            try {
+              await navigator.clipboard.writeText(text);
+              const label = button.textContent;
+              button.textContent = "Copied";
+              setTimeout(() => {
+                button.textContent = label;
+              }, 1200);
+            } catch (_error) {
+              button.textContent = "Copy failed";
+              setTimeout(() => {
+                button.textContent = "Copy";
+              }, 1200);
+            }
+          });
+        });
+      })();
+    </script>
   </body>
 </html>
