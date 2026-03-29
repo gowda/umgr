@@ -125,40 +125,70 @@
     - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
     - [ ] Commit created
 
-- [ ] Phase 7: Apply Engine
-  - [ ] Task 7.1: Implement apply execution and state persistence
+- [ ] Phase 7: First Concrete Provider (GitHub)
+  - [ ] Task 7.1: Implement GitHub provider scaffold and registration
+    - [ ] Add `github` provider class with contract methods (validate/current/plan/apply)
+    - [ ] Add provider-specific configuration contract (org, auth token/env, team mapping inputs)
     - [ ] CLI verification (Aruba)
     - [ ] Library verification (RSpec)
     - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
     - [ ] Commit created
-  - [ ] Task 7.2: Implement idempotency checks (apply then plan yields no changes)
+  - [ ] Task 7.2: Implement GitHub import/current state retrieval
+    - [ ] Import org users and team membership snapshots through GitHub API
+    - [ ] Normalize imported state into canonical identities (`github.user.<login>`)
     - [ ] CLI verification (Aruba)
     - [ ] Library verification (RSpec)
     - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
     - [ ] Commit created
-  - [ ] Task 7.3: Implement failure safety to prevent state corruption on apply errors
+  - [ ] Task 7.3: Implement GitHub drift planning for org + team membership
+    - [ ] Detect invite/add/remove/no-change actions from desired vs current state
+    - [ ] Include provider-specific plan details in structured output
     - [ ] CLI verification (Aruba)
     - [ ] Library verification (RSpec)
     - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
     - [ ] Commit created
-  - [ ] Task 7.4: Implement import command/API to fetch current users from providers/plugins into managed state
+  - [ ] Task 7.4: Implement GitHub apply execution for membership reconciliation
+    - [ ] Apply org invitations and team membership updates safely
+    - [ ] Persist resulting state and preserve idempotency guarantees
     - [ ] CLI verification (Aruba)
     - [ ] Library verification (RSpec)
     - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
     - [ ] Commit created
 
-- [ ] Phase 8: Hardening + Docs Consistency
-  - [ ] Task 8.1: Add end-to-end workflow coverage (init -> validate -> plan -> apply -> show)
+- [ ] Phase 8: Apply Engine
+  - [ ] Task 8.1: Implement apply execution and state persistence
     - [ ] CLI verification (Aruba)
     - [ ] Library verification (RSpec)
     - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
     - [ ] Commit created
-  - [ ] Task 8.2: Run README/provider-doc consistency pass and fix mismatches
+  - [ ] Task 8.2: Implement idempotency checks (apply then plan yields no changes)
     - [ ] CLI verification (Aruba)
     - [ ] Library verification (RSpec)
     - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
     - [ ] Commit created
-  - [ ] Task 8.3: Final stabilization with all checks green
+  - [ ] Task 8.3: Implement failure safety to prevent state corruption on apply errors
+    - [ ] CLI verification (Aruba)
+    - [ ] Library verification (RSpec)
+    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [ ] Commit created
+  - [ ] Task 8.4: Implement import command/API to fetch current users from providers/plugins into managed state
+    - [ ] CLI verification (Aruba)
+    - [ ] Library verification (RSpec)
+    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [ ] Commit created
+
+- [ ] Phase 9: Hardening + Docs Consistency
+  - [ ] Task 9.1: Add end-to-end workflow coverage (init -> validate -> plan -> apply -> show)
+    - [ ] CLI verification (Aruba)
+    - [ ] Library verification (RSpec)
+    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [ ] Commit created
+  - [ ] Task 9.2: Run README/provider-doc consistency pass and fix mismatches
+    - [ ] CLI verification (Aruba)
+    - [ ] Library verification (RSpec)
+    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [ ] Commit created
+  - [ ] Task 9.3: Final stabilization with all checks green
     - [ ] CLI verification (Aruba)
     - [ ] Library verification (RSpec)
     - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
