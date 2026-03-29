@@ -75,94 +75,39 @@
 
   </details>
 - [x] Phase 8: Apply Engine
+  <details>
+  <summary>Tasks (4)</summary>
+
   - [x] Task 8.1: Implement apply execution and state persistence
-    - [x] CLI verification (Aruba)
-    - [x] Library verification (RSpec)
-    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [x] Commit created
   - [x] Task 8.2: Implement idempotency checks (apply then plan yields no changes)
-    - [x] CLI verification (Aruba)
-    - [x] Library verification (RSpec)
-    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [x] Commit created
   - [x] Task 8.3: Implement failure safety to prevent state corruption on apply errors
-    - [x] CLI verification (Aruba)
-    - [x] Library verification (RSpec)
-    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [x] Commit created
   - [x] Task 8.4: Implement import command/API to fetch current users from providers/plugins into managed state
-    - [x] CLI verification (Aruba)
-    - [x] Library verification (RSpec)
-    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [x] Commit created
+
+  </details>
 
 - [x] Phase 9: Hardening + Docs Consistency
-  - [x] Task 9.1: Add end-to-end workflow coverage (init -> validate -> plan -> apply -> show)
-    - [x] CLI verification (Aruba)
-    - [x] Library verification (RSpec)
-    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [x] Commit created
-  - [x] Task 9.1a: Re-enable `rubocop-rspec` cops and align test suite with enforced guidelines
-    - [x] Burn down and remove temporary `rubocop-rspec` suppressions from `.rubocop_todo.yml`
-    - [x] Refactor specs to satisfy the re-enabled cops without reducing coverage quality
-    - [x] CLI verification (Aruba)
-    - [x] Library verification (RSpec)
-    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [x] Commit created
-  - [x] Task 9.2: Run README/provider-doc consistency pass and fix mismatches
-    - [x] CLI verification (Aruba)
-    - [x] Library verification (RSpec)
-    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [x] Commit created
-  - [x] Task 9.3: Final stabilization with all checks green
-    - [x] CLI verification (Aruba)
-    - [x] Library verification (RSpec)
-    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [x] Commit created
-  - [x] Task 9.4: Add static GitHub Pages website for umgr (single-page, precise/exhaustive, no bloat)
-    - [x] Create static `docs/index.html` + minimal CSS assets (no Jekyll generation pipeline)
-    - [x] Ensure content includes accurate code samples for CLI and Gemfile usage
-    - [x] Configure GitHub Pages deployment workflow for static `docs/` content
-    - [x] Document local preview/edit workflow for website content
-    - [x] Mark as required prerequisite before private package publishing work begins
-    - [x] CLI verification (Aruba)
-    - [x] Library verification (RSpec)
-    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [x] Commit created
+  <details>
+  <summary>Tasks (5)</summary>
 
-- [ ] Phase 10: Release + Distribution
+  - [x] Task 9.1: Add end-to-end workflow coverage (init -> validate -> plan -> apply -> show)
+  - [x] Task 9.1a: Re-enable `rubocop-rspec` cops and align test suite with enforced guidelines
+  - [x] Task 9.2: Run README/provider-doc consistency pass and fix mismatches
+  - [x] Task 9.3: Final stabilization with all checks green
+  - [x] Task 9.4: Add static GitHub Pages website for umgr (single-page, precise/exhaustive, no bloat)
+
+  </details>
+
+- [x] Phase 10: Release + Distribution
+  <details>
+  <summary>Tasks (5)</summary>
+
   - [x] Prerequisite: Task 9.4 static website is completed before publishing work
   - [x] Task 10.1: Add private publish workflow for GitHub Packages triggered by GitHub Release publish event
-    - [x] Use `on: release` with `types: [published]`
-    - [x] Configure publish auth using `GITHUB_TOKEN` with required package permissions
-    - [x] CLI verification (Aruba)
-    - [x] Library verification (RSpec)
-    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [x] Commit created
   - [x] Task 10.2: Enforce progressive SemVer validation in release workflow before publish
-    - [x] Validate release tag format and match against gem version
-    - [x] Ensure new release version is strictly greater than previously published registry version
-    - [x] Fail workflow on SemVer or monotonic-version violations
-    - [x] CLI verification (Aruba)
-    - [x] Library verification (RSpec)
-    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [x] Commit created
   - [x] Task 10.3: Document private installation and Gemfile usage for GitHub Packages in README.md
-    - [x] Add `gem install` instructions for private GitHub Packages consumption
-    - [x] Add Gemfile `source` + authentication setup for private package usage
-    - [x] Document consumer credential requirements for private installs
-    - [x] CLI verification (Aruba)
-    - [x] Library verification (RSpec)
-    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [x] Commit created
   - [x] Task 10.4: Add public RubyGems publish readiness plan using OIDC trusted publishing (no long-lived API key secrets)
-    - [x] Define release-triggered workflow gates for RubyGems publish
-    - [x] Configure OIDC permissions (`id-token: write`) and trusted publishing prerequisites
-    - [x] Document promotion path from private prerelease to public stable release
-    - [x] CLI verification (Aruba)
-    - [x] Library verification (RSpec)
-    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [x] Commit created
+
+  </details>
 
 - [ ] Phase 11: Post-Release DSL Config Generator
   - [ ] Task 11.1: Add Ruby DSL compiler that generates authoritative YAML/JSON config output (DSL is not runtime source)
