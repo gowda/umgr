@@ -1,6 +1,7 @@
 # umgr
 
 [![checks](https://github.com/gowda/umgr/actions/workflows/checks.yml/badge.svg)](https://github.com/gowda/umgr/actions/workflows/checks.yml)
+[![CodeQL Advanced](https://github.com/gowda/umgr/actions/workflows/codeql.yml/badge.svg)](https://github.com/gowda/umgr/actions/workflows/codeql.yml)
 
 `umgr` is a declarative account lifecycle tool for managing user account state
 across platforms with a desired-state workflow.
