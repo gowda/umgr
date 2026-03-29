@@ -30,8 +30,8 @@ Validation failure contract for `validate(resource:)`:
 - Recommended: return `{ ok: true, imported_accounts: [resource_hash, ...] }`.
 - Also supported:
   - `{ ok: true, resource: resource_hash }`
-  - `{ ok: true, account: account_hash, resource: resource_hash }` where
-    `account` must be a hash and is mapped into `attributes`.
+  - `{ ok: true, account: account_hash }` where `account` must be a hash and is
+    mapped into `attributes`.
 - Return `{ ok: false, error: "..." }` (or string-key equivalent) to surface
   provider fetch/import failures.
 
