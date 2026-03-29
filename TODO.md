@@ -269,11 +269,15 @@
     - [x] Pre-commit checks passed (rubocop + rspec + aruba)
     - [x] Commit created
     </details>
-  - [ ] Task 8.2: Implement idempotency checks (apply then plan yields no changes)
-    - [ ] CLI verification (Aruba)
-    - [ ] Library verification (RSpec)
-    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [ ] Commit created
+  - [x] Task 8.2: Implement idempotency checks (apply then plan yields no changes)
+    <details>
+    <summary>Checklist</summary>
+
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
+    </details>
   - [ ] Task 8.3: Implement failure safety to prevent state corruption on apply errors
     - [ ] CLI verification (Aruba)
     - [ ] Library verification (RSpec)

@@ -163,6 +163,43 @@ RSpec.describe 'umgr commands', :cli do
     )
     expect(parsed.fetch('state').fetch('resources').first.fetch('attributes')).to eq('team' => 'platform')
     expect(parsed.fetch('apply_results').first.fetch('status')).to eq('applied')
+    expect(parsed.fetch('idempotency')).to eq(
+      'checked' => true,
+      'stable' => true,
+      'summary' => {
+        'create' => 0,
+        'update' => 0,
+        'delete' => 0,
+        'no_change' => 1
+      }
+    )
+  end
+
+  it 'returns no drift when plan is run after apply for the same config' do
+    write_file(
+      'users.yml',
+      <<~YAML
+        version: 1
+        resources:
+          - provider: echo
+            type: user
+            name: alice
+            attributes:
+              team: platform
+      YAML
+    )
+    write_file('.umgr/state.json', JSON.generate(version: 1, resources: []))
+
+    run_command("#{executable} apply --config users.yml")
+    expect(last_command_started).to have_exit_status(0)
+
+    run_command("#{executable} plan --config users.yml")
+
+    expect(last_command_started).to have_exit_status(0)
+    lines = last_command_started.stdout.lines.map(&:strip).reject(&:empty?)
+    expect(lines.first).to eq('Drift detected: no (changes=0)')
+    expect(lines[1]).to eq('Plan summary: create=0 update=0 delete=0 no_change=1')
+    expect(lines[2..]).to eq(['NO_CHANGE echo.user.alice'])
   end
 
   it 'renders plan output as json when --json is provided' do
