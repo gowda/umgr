@@ -92,11 +92,11 @@
     - [x] Commit created
 
 - [ ] Phase 5: Provider Authoring Documentation
-  - [ ] Task 5.1: Add detailed provider/plugin authoring guide in separate markdown file after first provider implementation
-    - [ ] CLI verification (Aruba)
-    - [ ] Library verification (RSpec)
-    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [ ] Commit created
+  - [x] Task 5.1: Add detailed provider/plugin authoring guide in separate markdown file after first provider implementation
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
   - [ ] Task 5.2: Update README.md to point to provider authoring guide
     - [ ] CLI verification (Aruba)
     - [ ] Library verification (RSpec)
