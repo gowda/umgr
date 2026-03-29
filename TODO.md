@@ -155,14 +155,14 @@
     - [x] Library verification (RSpec)
     - [x] Pre-commit checks passed (rubocop + rspec + aruba)
     - [x] Commit created
-  - [ ] Task 10.4: Add public RubyGems publish readiness plan using OIDC trusted publishing (no long-lived API key secrets)
-    - [ ] Define release-triggered workflow gates for RubyGems publish
-    - [ ] Configure OIDC permissions (`id-token: write`) and trusted publishing prerequisites
-    - [ ] Document promotion path from private prerelease to public stable release
-    - [ ] CLI verification (Aruba)
-    - [ ] Library verification (RSpec)
-    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [ ] Commit created
+  - [x] Task 10.4: Add public RubyGems publish readiness plan using OIDC trusted publishing (no long-lived API key secrets)
+    - [x] Define release-triggered workflow gates for RubyGems publish
+    - [x] Configure OIDC permissions (`id-token: write`) and trusted publishing prerequisites
+    - [x] Document promotion path from private prerelease to public stable release
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
 
 - [ ] Phase 11: Post-Release DSL Config Generator
   - [ ] Task 11.1: Add Ruby DSL compiler that generates authoritative YAML/JSON config output (DSL is not runtime source)

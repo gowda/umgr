@@ -117,3 +117,10 @@ Configure Bundler authentication for GitHub Packages:
 ```bash
 bundle config set --global rubygems.pkg.github.com "<GITHUB_USERNAME>:<YOUR_GITHUB_TOKEN>"
 ```
+
+## Public RubyGems Release Path (OIDC)
+
+Public RubyGems publishing is gated behind OIDC trusted publishing readiness.
+
+- Workflow: `.github/workflows/publish-rubygems.yml`
+- Readiness + promotion doc: [`docs/release-rubygems-oidc.md`](docs/release-rubygems-oidc.md)
