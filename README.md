@@ -75,3 +75,45 @@ result = runner.dispatch(:plan, config: "examples/users.yml")
 puts result[:ok]
 puts result.dig(:changeset, :summary)
 ```
+
+## Private Installation (GitHub Packages)
+
+`umgr` pre-releases are published to GitHub Packages (`rubygems`).
+
+1. Create a GitHub token with:
+- `read:packages`
+- `repo` (required when the package repository is private)
+
+2. Configure RubyGems credentials:
+
+```bash
+mkdir -p ~/.gem
+cat > ~/.gem/credentials <<'EOF'
+---
+:github: Bearer <YOUR_GITHUB_TOKEN>
+EOF
+chmod 0600 ~/.gem/credentials
+```
+
+3. Install directly:
+
+```bash
+gem install umgr \
+  --source "https://rubygems.pkg.github.com/gowda" \
+  --key github
+```
+
+### Gemfile Usage (Private Package)
+
+```ruby
+source "https://rubygems.org"
+source "https://rubygems.pkg.github.com/gowda" do
+  gem "umgr"
+end
+```
+
+Configure Bundler authentication for GitHub Packages:
+
+```bash
+bundle config set --global rubygems.pkg.github.com "<GITHUB_USERNAME>:<YOUR_GITHUB_TOKEN>"
+```

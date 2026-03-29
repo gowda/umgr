@@ -147,14 +147,14 @@
     - [x] Library verification (RSpec)
     - [x] Pre-commit checks passed (rubocop + rspec + aruba)
     - [x] Commit created
-  - [ ] Task 10.3: Document private installation and Gemfile usage for GitHub Packages in README.md
-    - [ ] Add `gem install` instructions for private GitHub Packages consumption
-    - [ ] Add Gemfile `source` + authentication setup for private package usage
-    - [ ] Document consumer credential requirements for private installs
-    - [ ] CLI verification (Aruba)
-    - [ ] Library verification (RSpec)
-    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [ ] Commit created
+  - [x] Task 10.3: Document private installation and Gemfile usage for GitHub Packages in README.md
+    - [x] Add `gem install` instructions for private GitHub Packages consumption
+    - [x] Add Gemfile `source` + authentication setup for private package usage
+    - [x] Document consumer credential requirements for private installs
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
   - [ ] Task 10.4: Add public RubyGems publish readiness plan using OIDC trusted publishing (no long-lived API key secrets)
     - [ ] Define release-triggered workflow gates for RubyGems publish
     - [ ] Configure OIDC permissions (`id-token: write`) and trusted publishing prerequisites
