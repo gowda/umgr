@@ -33,30 +33,55 @@ module Umgr
       context.compiled_config || result
     end
 
-    class UmgrAssignmentParser
-      ASSIGNMENT_LINE_PATTERN = /^\s*([a-z_]\w*)\s*=/
-
+    class BlockBodyExtractor
       def initialize(source_lines)
         @source_lines = source_lines
       end
 
-      def assignment_names_for(block)
+      def call(block)
         start_index = block.source_location.fetch(1) - 1
-        body_lines = extract_umgr_block_lines(start_index)
-        body_lines.filter_map do |line|
-          match = line.match(ASSIGNMENT_LINE_PATTERN)
-          match && match[1].to_sym
-        end.uniq
+        line = @source_lines.fetch(start_index, '')
+        inline_body = line[/\{(.*)\}\s*$/, 1]
+        return [inline_body] if inline_body && inline_block_line?(line)
+
+        opening_index = opening_do_index(start_index)
+        nested_block_lines(opening_index + 1)
       end
 
       private
 
-      def extract_umgr_block_lines(start_index)
-        line = @source_lines.fetch(start_index, '')
-        inline_body = line[/\{(.*)\}/, 1]
-        return [inline_body] if line.include?('{') && inline_body
+      def inline_block_line?(line)
+        line.include?('{') && !line.include?(' do')
+      end
 
-        nested_block_lines(start_index + 1)
+      def opening_do_index(start_index)
+        depth = 0
+        index = start_index
+
+        while index >= 0
+          stripped = @source_lines[index].strip
+          depth = increment_depth_for_end(depth, stripped)
+          found, depth = decrement_depth_for_do(depth, stripped)
+          return index if found
+
+          index -= 1
+        end
+
+        start_index
+      end
+
+      def increment_depth_for_end(depth, stripped)
+        return depth + 1 if stripped == 'end'
+
+        depth
+      end
+
+      def decrement_depth_for_do(depth, stripped)
+        return [false, depth] unless stripped.end_with?(' do') || stripped.include?(' do |')
+
+        return [true, depth] if depth.zero?
+
+        [false, depth - 1]
       end
 
       def nested_block_lines(start_index)
@@ -86,6 +111,100 @@ module Umgr
         lines << current
         depth += 1 if stripped.end_with?(' do')
         [depth, index + 1]
+      end
+    end
+
+    class UmgrAssignmentParser
+      ASSIGNMENT_LINE_PATTERN = /^\s*([a-z_]\w*)\s*=/
+
+      def initialize(block_body_extractor)
+        @block_body_extractor = block_body_extractor
+      end
+
+      def assignment_names_for(block)
+        @block_body_extractor.call(block).filter_map do |line|
+          match = line.match(ASSIGNMENT_LINE_PATTERN)
+          match && match[1].to_sym
+        end.uniq
+      end
+    end
+
+    class ResourceBlockAttributeParser
+      ASSIGNMENT_EXPRESSION_PATTERN = /^\s*([a-z_]\w*)\s*=\s*(.+?)\s*$/
+
+      def initialize(block_body_extractor)
+        @block_body_extractor = block_body_extractor
+      end
+
+      def attributes_for(block)
+        return {} unless block
+
+        @block_body_extractor.call(block).each_with_object({}) do |line, memo|
+          match = line.match(ASSIGNMENT_EXPRESSION_PATTERN)
+          next unless match
+
+          name = match[1]
+          expression = match[2]
+          memo[name] = evaluate_expression(block, name, expression)
+        end
+      end
+
+      private
+
+      def evaluate_expression(block, name, expression)
+        block.binding.eval(expression)
+      rescue StandardError => e
+        ::Kernel.raise(
+          ::Umgr::Errors::ValidationError,
+          "Unable to evaluate resource block assignment `#{name}`: #{e.message}"
+        )
+      end
+    end
+
+    class ResourceAttributeMerger
+      def call(options, block_attributes)
+        explicit_attributes = normalize_explicit_attributes(options)
+        merged_attributes = explicit_attributes.merge(block_attributes)
+        return options if merged_attributes.empty? && !options.key?(:attributes)
+
+        options.merge(attributes: deep_sort_hash(merged_attributes))
+      end
+
+      private
+
+      def normalize_explicit_attributes(options)
+        raw = options.fetch(:attributes, {})
+        return {} if raw.nil?
+        return stringify_hash_keys(raw) if raw.is_a?(Hash)
+
+        ::Kernel.raise(
+          ::Umgr::Errors::ValidationError,
+          "Resource attributes must be a hash: #{raw.inspect}"
+        )
+      end
+
+      def deep_sort_hash(value)
+        case value
+        when Hash
+          deep_sort_hash_pairs(value)
+        when Array
+          value.map { |item| deep_sort_hash(item) }
+        else
+          value
+        end
+      end
+
+      def deep_sort_hash_pairs(value)
+        value
+          .transform_keys(&:to_s)
+          .sort_by { |key, _| key }
+          .each_with_object({}) { |(key, nested), memo| memo[key] = deep_sort_hash(nested) }
+      end
+
+      def stringify_hash_keys(value)
+        value.each_with_object({}) do |(key, nested), memo|
+          memo[key.to_s] = nested
+        end
       end
     end
 
@@ -165,7 +284,10 @@ module Umgr
         @builder = Builder.new
         @umgr_defined = false
         @inside_umgr = false
-        @assignment_parser = UmgrAssignmentParser.new(source.lines)
+        @block_body_extractor = BlockBodyExtractor.new(source.lines)
+        @assignment_parser = UmgrAssignmentParser.new(@block_body_extractor)
+        @resource_block_attribute_parser = ResourceBlockAttributeParser.new(@block_body_extractor)
+        @resource_attribute_merger = ResourceAttributeMerger.new
         @resource_reference_parser = ResourceReferenceParser.new
         @account_entry_normalizer = AccountEntryNormalizer.new
         @resource_item_validator = ResourceItemValidator.new
@@ -183,11 +305,12 @@ module Umgr
         @inside_umgr = false
       end
 
-      def resource(identifier = nil, name = nil, **options)
+      def resource(identifier = nil, name = nil, **options, &block)
         if @inside_umgr
           ::Kernel.raise ::Umgr::Errors::ValidationError, '`resource` must be declared at top-level, outside `umgr`'
         end
 
+        options = @resource_attribute_merger.call(options, @resource_block_attribute_parser.attributes_for(block))
         provider, type, resource_name = @resource_reference_parser.call(identifier, name, options)
         builder.resource(provider: provider, type: type, name: resource_name, **options)
       end

@@ -159,14 +159,14 @@
     - [x] Library verification (RSpec)
     - [x] Pre-commit checks passed (rubocop + rspec + aruba)
     - [x] Commit created
-  - [ ] Task 12.3: Assignment capture and attribute mapping
-    - [ ] Capture block local assignments (`team = 'platform'`) into `attributes`
-    - [ ] Merge behavior with explicit `attributes:` options
-    - [ ] Deterministic ordering preserved
-    - [ ] CLI verification (Aruba)
-    - [ ] Library verification (RSpec)
-    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [ ] Commit created
+  - [x] Task 12.3: Assignment capture and attribute mapping
+    - [x] Capture block local assignments (`team = 'platform'`) into `attributes`
+    - [x] Merge behavior with explicit `attributes:` options
+    - [x] Deterministic ordering preserved
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
   - [ ] Task 12.4: Docs and examples migration
     - [ ] Update README + DSL docs to assignment-only syntax
     - [ ] Add exhaustive configuration examples in all supported formats: `umgr.rb`, `umgr.yml`/`umgr.yaml`, and `umgr.json`

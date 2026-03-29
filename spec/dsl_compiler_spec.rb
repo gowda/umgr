@@ -73,6 +73,76 @@ RSpec.describe Umgr::DslCompiler do
     end
   end
 
+  it 'captures resource block assignments into attributes' do
+    Dir.mktmpdir do |tmp_dir|
+      dsl_path = File.join(tmp_dir, 'umgr.rb')
+      File.write(
+        dsl_path,
+        <<~RUBY
+          umgr do
+            version = 1
+          end
+
+          resource 'echo.user', 'alice' do
+            team = 'platform'
+            role = 'admin'
+          end
+        RUBY
+      )
+
+      result = described_class.compile_file(dsl_path)
+      attributes = result.fetch('resources').first.fetch('attributes')
+      expect(attributes).to eq({ 'role' => 'admin', 'team' => 'platform' })
+    end
+  end
+
+  it 'merges explicit attributes with block assignments and keeps deterministic order' do
+    Dir.mktmpdir do |tmp_dir|
+      dsl_path = File.join(tmp_dir, 'umgr.rb')
+      File.write(
+        dsl_path,
+        <<~RUBY
+          umgr do
+            version = 1
+          end
+
+          resource 'echo.user', 'alice', attributes: { team: 'infra', location: 'us' } do
+            team = 'platform'
+            level = 'l2'
+          end
+        RUBY
+      )
+
+      result = described_class.compile_file(dsl_path)
+      attributes = result.fetch('resources').first.fetch('attributes')
+      expect(attributes).to eq({ 'level' => 'l2', 'location' => 'us', 'team' => 'platform' })
+    end
+  end
+
+  it 'evaluates block assignment expressions in DSL scope' do
+    Dir.mktmpdir do |tmp_dir|
+      dsl_path = File.join(tmp_dir, 'umgr.rb')
+      File.write(
+        dsl_path,
+        <<~RUBY
+          umgr do
+            version = 1
+          end
+
+          for_each(%w[alice]) do |name|
+            resource 'echo.user', name do
+              team = "team-\#{name}"
+            end
+          end
+        RUBY
+      )
+
+      result = described_class.compile_file(dsl_path)
+      attributes = result.fetch('resources').first.fetch('attributes')
+      expect(attributes).to eq({ 'team' => 'team-alice' })
+    end
+  end
+
   it 'supports provider matrix and deterministic ordering in compiled output' do
     Dir.mktmpdir do |tmp_dir|
       dsl_path = File.join(tmp_dir, 'umgr.rb')
