@@ -97,11 +97,11 @@
     - [x] Library verification (RSpec)
     - [x] Pre-commit checks passed (rubocop + rspec + aruba)
     - [x] Commit created
-  - [ ] Task 5.2: Update README.md to point to provider authoring guide
-    - [ ] CLI verification (Aruba)
-    - [ ] Library verification (RSpec)
-    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [ ] Commit created
+  - [x] Task 5.2: Update README.md to point to provider authoring guide
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
 
 - [ ] Phase 6: Planning Engine
   - [ ] Task 6.1: Implement canonical resource identity (provider.type.name)
