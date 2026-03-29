@@ -184,7 +184,7 @@
     - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
     - [ ] Commit created
   - [ ] Task 9.1a: Re-enable `rubocop-rspec` cops and align test suite with enforced guidelines
-    - [ ] Remove temporary disables from `.rubocop.yml` for `rubocop-rspec`
+    - [ ] Burn down and remove temporary `rubocop-rspec` suppressions from `.rubocop_todo.yml`
     - [ ] Refactor specs to satisfy the re-enabled cops without reducing coverage quality
     - [ ] CLI verification (Aruba)
     - [ ] Library verification (RSpec)
