@@ -2,13 +2,11 @@
 
 module Umgr
   module PlanResultBuilder
-    INITIAL_STATE = { version: 1, resources: [].freeze }.freeze
-
     module_function
 
     def call(state_backend:, options:)
       desired_state = options.fetch(:desired_state)
-      current_state = DesiredStateEnricher.call(state_backend.read || INITIAL_STATE)
+      current_state = DesiredStateEnricher.call(state_backend.read || StateTemplate::INITIAL_STATE)
       changeset = build_changeset(desired_state: desired_state, current_state: current_state)
       build_result(options: options, state_backend: state_backend, current_state: current_state, changeset: changeset)
     end
