@@ -100,12 +100,12 @@ module Umgr
 
       def import_accounts(org:, token:)
         users = api_client.list_org_users(org: org, token: token)
-        users.map { |user| normalize_account(user: user, org: org, token: token) }
-      end
-
-      def normalize_account(user:, org:, token:)
-        teams = api_client.list_user_teams(org: org, login: user.fetch('login'), token: token)
-        GithubAccountNormalizer.call(user: user, org: org, teams: teams)
+        memberships = api_client.list_org_team_memberships(org: org, token: token)
+        users.map do |user|
+          login = user.fetch('login')
+          teams = memberships.fetch(login, [])
+          GithubAccountNormalizer.call(user: user, org: org, teams: teams)
+        end
       end
     end
   end

@@ -57,8 +57,8 @@ RSpec.describe Umgr::Providers::GithubProvider do
         }
       ]
     )
-    allow(api_client).to receive(:list_user_teams).with(org: 'acme', login: 'alice', token: 'secret').and_return(
-      %w[platform admins]
+    allow(api_client).to receive(:list_org_team_memberships).with(org: 'acme', token: 'secret').and_return(
+      { 'alice' => %w[platform admins] }
     )
 
     result = provider.current(resource: resource.merge(token: 'secret'))
@@ -91,6 +91,7 @@ RSpec.describe Umgr::Providers::GithubProvider do
   it 'uses token_env when token is not provided' do
     allow(ENV).to receive(:fetch).with('GITHUB_TOKEN', nil).and_return('from-env')
     allow(api_client).to receive(:list_org_users).with(org: 'acme', token: 'from-env').and_return([])
+    allow(api_client).to receive(:list_org_team_memberships).with(org: 'acme', token: 'from-env').and_return({})
 
     result = provider.current(resource: resource)
 
