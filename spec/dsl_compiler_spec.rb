@@ -13,7 +13,7 @@ RSpec.describe Umgr::DslCompiler do
             version = 1
           end
 
-          resource provider: 'echo', type: 'user', name: 'alice', attributes: { team: 'platform' }
+          resource 'echo.user', 'alice', attributes: { team: 'platform' }
         RUBY
       )
 
@@ -52,15 +52,15 @@ RSpec.describe Umgr::DslCompiler do
           end
 
           for_each(%w[alice bob]) do |name|
-            resource provider: 'echo', type: 'user', name: name
+            resource 'echo.user', name
           end
 
           if_enabled(true) do
-            resource provider: 'echo', type: 'user', name: 'carol'
+            resource 'echo.user', 'carol'
           end
 
           if_enabled(false) do
-            resource provider: 'echo', type: 'user', name: 'skip-me'
+            resource 'echo.user', 'skip-me'
           end
         RUBY
       )
@@ -185,7 +185,7 @@ RSpec.describe Umgr::DslCompiler do
   it 'raises validation error when top-level umgr block is missing' do
     Dir.mktmpdir do |tmp_dir|
       dsl_path = File.join(tmp_dir, 'umgr.rb')
-      File.write(dsl_path, "resource provider: 'echo', type: 'user', name: 'alice'\n")
+      File.write(dsl_path, "resource 'echo.user', 'alice'\n")
 
       expect do
         described_class.compile_file(dsl_path)
@@ -201,7 +201,7 @@ RSpec.describe Umgr::DslCompiler do
         <<~RUBY
           umgr do
             version = 1
-            resource provider: 'echo', type: 'user', name: 'alice'
+            resource 'echo.user', 'alice'
           end
         RUBY
       )
@@ -246,6 +246,66 @@ RSpec.describe Umgr::DslCompiler do
       expect do
         described_class.compile_file(dsl_path)
       end.to raise_error(Umgr::Errors::ValidationError, /Unsupported.*assignment/)
+    end
+  end
+
+  it 'raises validation error for invalid resource identifier format' do
+    Dir.mktmpdir do |tmp_dir|
+      dsl_path = File.join(tmp_dir, 'umgr.rb')
+      File.write(
+        dsl_path,
+        <<~RUBY
+          umgr do
+            version = 1
+          end
+
+          resource 'echo', 'alice'
+        RUBY
+      )
+
+      expect do
+        described_class.compile_file(dsl_path)
+      end.to raise_error(Umgr::Errors::ValidationError, /provider\.type/)
+    end
+  end
+
+  it 'raises validation error for legacy resource keyword syntax' do
+    Dir.mktmpdir do |tmp_dir|
+      dsl_path = File.join(tmp_dir, 'umgr.rb')
+      File.write(
+        dsl_path,
+        <<~RUBY
+          umgr do
+            version = 1
+          end
+
+          resource provider: 'echo', type: 'user', name: 'alice'
+        RUBY
+      )
+
+      expect do
+        described_class.compile_file(dsl_path)
+      end.to raise_error(Umgr::Errors::ValidationError, /Legacy resource syntax/)
+    end
+  end
+
+  it 'raises validation error when resources item is missing required keys' do
+    Dir.mktmpdir do |tmp_dir|
+      dsl_path = File.join(tmp_dir, 'umgr.rb')
+      File.write(
+        dsl_path,
+        <<~RUBY
+          umgr do
+            version = 1
+          end
+
+          resources([{ provider: 'echo', name: 'alice' }])
+        RUBY
+      )
+
+      expect do
+        described_class.compile_file(dsl_path)
+      end.to raise_error(Umgr::Errors::ValidationError, /resources\(\.\.\.\) item is missing required key\(s\): type/)
     end
   end
 end

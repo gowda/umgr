@@ -92,7 +92,7 @@ RSpec.describe 'umgr commands', :cli do
           version = 1
         end
 
-        resource provider: 'echo', type: 'user', name: 'alice', attributes: { team: 'platform' }
+        resource 'echo.user', 'alice', attributes: { team: 'platform' }
       RUBY
     )
 

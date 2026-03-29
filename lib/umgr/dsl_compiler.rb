@@ -89,12 +89,86 @@ module Umgr
       end
     end
 
+    class ResourceReferenceParser
+      def call(identifier, name, options)
+        raise_legacy_resource_syntax_error!(options) if legacy_resource_syntax?(identifier, name, options)
+
+        provider, type = parse_resource_identifier!(identifier)
+        resource_name = parse_resource_name!(name)
+        [provider, type, resource_name]
+      end
+
+      private
+
+      def legacy_resource_syntax?(identifier, name, options)
+        identifier.nil? && name.nil? && options.key?(:provider) && options.key?(:type) && options.key?(:name)
+      end
+
+      def raise_legacy_resource_syntax_error!(options)
+        ::Kernel.raise(
+          ::Umgr::Errors::ValidationError,
+          "Legacy resource syntax is not supported: #{options.inspect}. Use: resource 'provider.type', 'name'"
+        )
+      end
+
+      def parse_resource_identifier!(identifier)
+        match = identifier.to_s.match(/\A([^.]+)\.([^.]+)\z/)
+        unless match
+          ::Kernel.raise(
+            ::Umgr::Errors::ValidationError,
+            "Resource identifier must be in 'provider.type' format: #{identifier.inspect}"
+          )
+        end
+
+        [match[1], match[2]]
+      end
+
+      def parse_resource_name!(name)
+        value = name.to_s
+        if value.empty?
+          ::Kernel.raise(::Umgr::Errors::ValidationError, "Resource name must be a non-empty string: #{name.inspect}")
+        end
+
+        value
+      end
+    end
+
+    class AccountEntryNormalizer
+      def call(entry)
+        return { 'name' => entry.to_s } unless entry.is_a?(::Hash)
+
+        normalized = entry.transform_keys(&:to_s)
+        name = normalized['name']
+        if !name.is_a?(::String) || name.empty?
+          ::Kernel.raise ::Umgr::Errors::ValidationError, 'provider_matrix account requires non-empty `name`'
+        end
+
+        normalized
+      end
+    end
+
+    class ResourceItemValidator
+      def call(item)
+        required = %w[provider type name]
+        missing = required.reject { |key| item.key?(key) }
+        return if missing.empty?
+
+        ::Kernel.raise(
+          ::Umgr::Errors::ValidationError,
+          "resources(...) item is missing required key(s): #{missing.join(', ')}"
+        )
+      end
+    end
+
     class Context < BasicObject
       def initialize(source:)
         @builder = Builder.new
         @umgr_defined = false
         @inside_umgr = false
         @assignment_parser = UmgrAssignmentParser.new(source.lines)
+        @resource_reference_parser = ResourceReferenceParser.new
+        @account_entry_normalizer = AccountEntryNormalizer.new
+        @resource_item_validator = ResourceItemValidator.new
       end
 
       def umgr(&)
@@ -109,12 +183,13 @@ module Umgr
         @inside_umgr = false
       end
 
-      def resource(provider:, type:, name:, **)
+      def resource(identifier = nil, name = nil, **options)
         if @inside_umgr
           ::Kernel.raise ::Umgr::Errors::ValidationError, '`resource` must be declared at top-level, outside `umgr`'
         end
 
-        builder.resource(provider: provider, type: type, name: name, **)
+        provider, type, resource_name = @resource_reference_parser.call(identifier, name, options)
+        builder.resource(provider: provider, type: type, name: resource_name, **options)
       end
 
       def if_enabled(condition, &)
@@ -135,13 +210,18 @@ module Umgr
 
       def resources(items)
         items.each do |item|
-          resource(**item.transform_keys(&:to_sym))
+          normalized = item.transform_keys(&:to_s)
+          @resource_item_validator.call(normalized)
+          resource(
+            "#{normalized.fetch('provider')}.#{normalized.fetch('type')}",
+            normalized.fetch('name'),
+            **normalized.except('provider', 'type', 'name').transform_keys(&:to_sym)
+          )
         end
       end
 
       def compiled_config
         ::Kernel.raise ::Umgr::Errors::ValidationError, 'Top-level `umgr` block is required' unless @umgr_defined
-
         builder.to_h
       end
 
@@ -175,27 +255,14 @@ module Umgr
       end
 
       def emit_matrix_resource(provider, type, entry, shared_options)
-        account = normalize_account_entry(entry)
+        account = @account_entry_normalizer.call(entry)
         account_name = account.delete('name')
         resource(
-          provider: provider.to_s,
-          type: type.to_s,
-          name: account_name.to_s,
+          "#{provider}.#{type}",
+          account_name.to_s,
           **shared_options,
           **account.transform_keys(&:to_sym)
         )
-      end
-
-      def normalize_account_entry(entry)
-        return { 'name' => entry.to_s } unless entry.is_a?(::Hash)
-
-        normalized = entry.transform_keys(&:to_s)
-        name = normalized['name']
-        if !name.is_a?(::String) || name.empty?
-          ::Kernel.raise ::Umgr::Errors::ValidationError, 'provider_matrix account requires non-empty `name`'
-        end
-
-        normalized
       end
 
       def method_missing(name, *_args, &)
