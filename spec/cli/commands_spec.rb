@@ -164,6 +164,51 @@ RSpec.describe 'umgr commands', :cli do
     )
   end
 
+  it 'includes github provider plan details in json plan output' do
+    write_file(
+      'users.yml',
+      <<~YAML
+        version: 1
+        resources:
+          - provider: github
+            type: user
+            name: alice
+            org: acme
+            token: secret
+            teams:
+              - admins
+              - security
+      YAML
+    )
+    write_file(
+      '.umgr/state.json',
+      JSON.generate(
+        version: 1,
+        resources: [
+          { provider: 'github', type: 'user', name: 'alice', org: 'acme', teams: %w[admins platform] }
+        ]
+      )
+    )
+
+    run_command("#{executable} plan --config users.yml --json")
+
+    expect(last_command_started).to have_exit_status(0)
+    parsed = JSON.parse(last_command_started.stdout)
+    change = parsed.fetch('changeset').fetch('changes').find { |item| item['identity'] == 'github.user.alice' }
+
+    expect(change['action']).to eq('update')
+    expect(change.fetch('provider_plan')).to include(
+      'provider' => 'github',
+      'organization_action' => 'keep',
+      'status' => 'planned'
+    )
+    expect(change.fetch('provider_plan').fetch('team_actions')).to eq(
+      'add' => ['security'],
+      'remove' => ['platform'],
+      'unchanged' => ['admins']
+    )
+  end
+
   it 'auto-discovers config for validate when --config is omitted' do
     write_file('umgr.yml', "version: 1\nresources: []\n")
     run_command("#{executable} validate")

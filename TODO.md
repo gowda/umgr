@@ -140,13 +140,13 @@
     - [x] Library verification (RSpec)
     - [x] Pre-commit checks passed (rubocop + rspec + aruba)
     - [x] Commit created
-  - [ ] Task 7.3: Implement GitHub drift planning for org + team membership
-    - [ ] Detect invite/add/remove/no-change actions from desired vs current state
-    - [ ] Include provider-specific plan details in structured output
-    - [ ] CLI verification (Aruba)
-    - [ ] Library verification (RSpec)
-    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [ ] Commit created
+  - [x] Task 7.3: Implement GitHub drift planning for org + team membership
+    - [x] Detect invite/add/remove/no-change actions from desired vs current state
+    - [x] Include provider-specific plan details in structured output
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
   - [ ] Task 7.4: Implement GitHub apply execution for membership reconciliation
     - [ ] Apply org invitations and team membership updates safely
     - [ ] Persist resulting state and preserve idempotency guarantees

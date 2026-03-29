@@ -40,7 +40,11 @@ module Umgr
 
     def plan(**options)
       resolved_options = with_resolved_config(:plan, options)
-      PlanResultBuilder.call(state_backend: state_backend, options: resolved_options)
+      PlanResultBuilder.call(
+        state_backend: state_backend,
+        options: resolved_options,
+        provider_registry: provider_registry
+      )
     end
 
     def apply(**options)
@@ -92,11 +96,7 @@ module Umgr
 
     def with_validated_config_options(action, resolved_options, resolved)
       desired_state = ensure_valid_config(resolved)
-      UnknownProviderGuard.validate!(
-        desired_state: desired_state,
-        action: action,
-        provider_registry: provider_registry
-      )
+      UnknownProviderGuard.validate!(desired_state: desired_state, action: action, provider_registry: provider_registry)
       ProviderResourceValidator.validate!(desired_state: desired_state, provider_registry: provider_registry)
       resolved_options.merge(config: resolved, desired_state: desired_state)
     end
