@@ -37,6 +37,14 @@ RSpec.describe Umgr::Providers::EchoProvider do
     expect(result[:status]).to eq('update')
   end
 
+  it 'returns no_change status when desired and current are the same' do
+    desired = { email: 'alice@example.com' }
+    result = provider.plan(desired: desired, current: desired)
+
+    expect(result[:ok]).to eq(true)
+    expect(result[:status]).to eq('no_change')
+  end
+
   it 'echoes changeset in apply' do
     result = provider.apply(changeset: { action: 'update' })
 
