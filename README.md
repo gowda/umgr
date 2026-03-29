@@ -72,6 +72,18 @@ umgr show
 `umgr.rb` is compile-time input only. Runtime commands (`validate`, `plan`,
 `apply`, `import`) consume YAML/JSON config, not DSL source directly.
 
+Assignment-only DSL shape:
+
+```ruby
+umgr do
+  version = 1
+end
+
+resource "echo.user", "alice" do
+  team = "platform"
+end
+```
+
 ```bash
 umgr compile > umgr.yml
 umgr plan --config umgr.yml
@@ -83,6 +95,10 @@ Pipeline mode:
 umgr compile | umgr plan --config -
 umgr compile | umgr apply --config -
 ```
+
+Exhaustive configuration examples for `umgr.rb`, `umgr.yml`/`umgr.yaml`, and
+`umgr.json`, plus migration/error notes:
+[`docs/dsl-compile.md`](docs/dsl-compile.md)
 
 ## Ruby API Example
 

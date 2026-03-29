@@ -5,6 +5,89 @@
 Use `umgr compile` to produce canonical YAML/JSON config, then pass the
 compiled output to runtime commands.
 
+## Assignment-Only DSL
+
+`umgr` now uses assignment-only DSL configuration:
+
+- Top-level `umgr` block is required.
+- `version` must be assigned inside `umgr` (for example, `version = 1`).
+- `resource` must be declared at top-level.
+- Resource definition uses only: `resource "provider.type", "name"`.
+
+## Exhaustive Configuration Examples
+
+### `umgr.rb`
+
+```ruby
+umgr do
+  version = 1
+end
+
+resource "echo.user", "alice", attributes: { location: "us" } do
+  team = "platform"
+  role = "admin"
+end
+
+resource "github.user", "bob" do
+  org = "acme"
+  teams = ["platform", "security"]
+end
+```
+
+### `umgr.yml` (same content can be saved as `umgr.yaml`)
+
+```yaml
+version: 1
+resources:
+  - provider: echo
+    type: user
+    name: alice
+    attributes:
+      location: us
+      role: admin
+      team: platform
+  - provider: github
+    type: user
+    name: bob
+    attributes:
+      org: acme
+      teams:
+        - platform
+        - security
+```
+
+### `umgr.json`
+
+```json
+{
+  "version": 1,
+  "resources": [
+    {
+      "provider": "echo",
+      "type": "user",
+      "name": "alice",
+      "attributes": {
+        "location": "us",
+        "role": "admin",
+        "team": "platform"
+      }
+    },
+    {
+      "provider": "github",
+      "type": "user",
+      "name": "bob",
+      "attributes": {
+        "org": "acme",
+        "teams": [
+          "platform",
+          "security"
+        ]
+      }
+    }
+  ]
+}
+```
+
 ## Compile First
 
 ```bash
@@ -44,17 +127,55 @@ Resolution options:
 If only `umgr.rb` exists (and no static config is auto-discovered), runtime
 commands fail with a compile-first error and include the pipeline hint.
 
+## Migration Notes
+
+### Old syntax to remove
+
+```ruby
+umgr do
+  version 1
+end
+
+resource provider: "echo", type: "user", name: "alice"
+```
+
+### New syntax
+
+```ruby
+umgr do
+  version = 1
+end
+
+resource "echo.user", "alice"
+```
+
+## Error Examples
+
+- Missing top-level `umgr` block:
+  - `Top-level 'umgr' block is required`
+- Legacy keyword resource syntax:
+  - `Legacy resource syntax is not supported ... Use: resource 'provider.type', 'name'`
+- Invalid resource identifier:
+  - `Resource identifier must be in 'provider.type' format`
+- Method-style version:
+  - `Unsupported DSL method 'version'`
+- Unsupported `umgr` assignment:
+  - `Unsupported 'umgr' assignment(s): ...`
+- Ambiguous auto-discovery (`umgr.rb` + static config):
+  - fails fast and asks you to use `--config` or compile pipeline mode.
+
 ## DSL Safety Rails
 
 DSL evaluation runs in a restricted context with allowlisted methods only:
 
 - `umgr`
-- `version`
 - `resource`
 - `resources`
 - `if_enabled`
 - `for_each`
 - `provider_matrix`
+
+`version` is not a DSL method; set it only via assignment inside `umgr`.
 
 Unknown methods raise `Umgr::Errors::ValidationError`.
 
