@@ -1,0 +1,41 @@
+name: publish-rubygems
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    if: startsWith(github.event.release.tag_name, 'v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.4"
+      - name: Guard: stable tags only for public release
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          version="${RELEASE_TAG#v}"
+          if [[ "${version}" == *pre* ]]; then
+            echo "Pre-release tags are not published to RubyGems from this workflow."
+            exit 1
+          fi
+      - name: Build gem
+        run: gem build umgr.gemspec
+      - name: OIDC trusted publishing readiness gate
+        run: |
+          echo "Configure RubyGems Trusted Publishing before enabling this step:"
+          echo "- Add this repository/workflow in RubyGems trusted publishers."
+          echo "- Ensure the workflow path and environment match RubyGems configuration."
+          echo "See docs/release-rubygems-oidc.md."
+          exit 1
+      # After RubyGems trusted publishing is configured, replace the readiness gate
+      # with the official publish step for trusted publishing.
