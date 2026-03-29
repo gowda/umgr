@@ -97,6 +97,7 @@ module Umgr
         action: action,
         provider_registry: provider_registry
       )
+      ProviderResourceValidator.validate!(desired_state: desired_state, provider_registry: provider_registry)
       resolved_options.merge(config: resolved, desired_state: desired_state)
     end
 

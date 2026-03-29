@@ -221,16 +221,9 @@ RSpec.describe 'umgr commands', :cli do
       <<~YAML
         version: 1
         resources:
-          - provider: github
+          - provider: atlassian
             type: user
             name: alice
-            attributes:
-              email: alice@example.com
-              first_name: Alice
-            org: platform
-            roles:
-              - admin
-              - writer
       YAML
     )
 
@@ -240,7 +233,29 @@ RSpec.describe 'umgr commands', :cli do
     error_line = last_command_started.stderr.lines.map(&:strip).reject(&:empty?).last
     parsed = JSON.parse(error_line)
     expect(parsed['error']['type']).to eq('Umgr::Errors::ValidationError')
-    expect(parsed['error']['message']).to match(/Unknown provider\(s\) for validate: github/)
+    expect(parsed['error']['message']).to match(/Unknown provider\(s\) for validate: atlassian/)
+  end
+
+  it 'returns validation error when github provider config is invalid' do
+    write_file(
+      'users.yml',
+      <<~YAML
+        version: 1
+        resources:
+          - provider: github
+            type: user
+            name: alice
+            token_env: GITHUB_TOKEN
+      YAML
+    )
+
+    run_command("#{executable} validate --config users.yml")
+
+    expect(last_command_started).to have_exit_status(Umgr::Errors::ValidationError::EXIT_CODE)
+    error_line = last_command_started.stderr.lines.map(&:strip).reject(&:empty?).last
+    parsed = JSON.parse(error_line)
+    expect(parsed['error']['type']).to eq('Umgr::Errors::ValidationError')
+    expect(parsed['error']['message']).to match(/requires non-empty `org`/)
   end
 
   it 'preserves attributes and provider-specific resource fields with echo provider' do

@@ -5,6 +5,7 @@ module Umgr
     def initialize
       @providers = {}
       register(:echo, Providers::EchoProvider.new)
+      register(:github, Providers::GithubProvider.new)
     end
 
     def register(name, provider)
