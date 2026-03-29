@@ -11,12 +11,20 @@ unless File.exist?(last_run_file)
 end
 
 result = JSON.parse(File.read(last_run_file)).fetch('result')
-line = format(
-  'line: %<percent>.2f%% (%<covered>d/%<total>d)',
-  percent: result.fetch('covered_percent'),
-  covered: result.fetch('covered_lines'),
-  total: result.fetch('total_lines')
-)
+
+line = if result.key?('covered_percent')
+         format(
+           'line: %<percent>.2f%% (%<covered>d/%<total>d)',
+           percent: result.fetch('covered_percent'),
+           covered: result.fetch('covered_lines'),
+           total: result.fetch('total_lines')
+         )
+       elsif result.key?('line')
+         format('line: %<percent>.2f%%', percent: result.fetch('line'))
+       else
+         'line: n/a'
+       end
+
 branch = if result['covered_branches'] && result['total_branches']
            format(
              'branch: %<percent>.2f%% (%<covered>d/%<total>d)',
@@ -24,6 +32,8 @@ branch = if result['covered_branches'] && result['total_branches']
              covered: result.fetch('covered_branches'),
              total: result.fetch('total_branches')
            )
+         elsif result.key?('branch')
+           format('branch: %<percent>.2f%%', percent: result.fetch('branch'))
          else
            'branch: n/a'
          end
@@ -31,8 +41,11 @@ branch = if result['covered_branches'] && result['total_branches']
 puts line
 puts branch
 
-File.open(ENV.fetch('GITHUB_STEP_SUMMARY'), 'a') do |file|
-  file.puts "### #{section_title}"
-  file.puts "- #{line}"
-  file.puts "- #{branch}"
+step_summary = ENV.fetch('GITHUB_STEP_SUMMARY', nil)
+if step_summary && !step_summary.empty?
+  File.open(step_summary, 'a') do |file|
+    file.puts "### #{section_title}"
+    file.puts "- #{line}"
+    file.puts "- #{branch}"
+  end
 end
