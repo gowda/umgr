@@ -33,14 +33,68 @@ module Umgr
       context.compiled_config || result
     end
 
-    class Context < BasicObject
-      ASSIGNMENT_LINE_PATTERN = /^\s*([a-z_]\w*)\s*=/.freeze
+    class UmgrAssignmentParser
+      ASSIGNMENT_LINE_PATTERN = /^\s*([a-z_]\w*)\s*=/
 
+      def initialize(source_lines)
+        @source_lines = source_lines
+      end
+
+      def assignment_names_for(block)
+        start_index = block.source_location.fetch(1) - 1
+        body_lines = extract_umgr_block_lines(start_index)
+        body_lines.filter_map do |line|
+          match = line.match(ASSIGNMENT_LINE_PATTERN)
+          match && match[1].to_sym
+        end.uniq
+      end
+
+      private
+
+      def extract_umgr_block_lines(start_index)
+        line = @source_lines.fetch(start_index, '')
+        inline_body = line[/\{(.*)\}/, 1]
+        return [inline_body] if line.include?('{') && inline_body
+
+        nested_block_lines(start_index + 1)
+      end
+
+      def nested_block_lines(start_index)
+        lines = []
+        depth = 1
+        index = start_index
+
+        loop do
+          break unless scanning_block?(depth, index)
+
+          depth, index = scan_block_line(lines, depth, index)
+        end
+
+        lines
+      end
+
+      def scanning_block?(depth, index)
+        depth.positive? && index < @source_lines.length
+      end
+
+      def scan_block_line(lines, depth, index)
+        current = @source_lines[index]
+        stripped = current.strip
+        depth -= 1 if stripped == 'end'
+        return [depth, index + 1] if depth.zero?
+
+        lines << current
+        depth += 1 if stripped.end_with?(' do')
+        [depth, index + 1]
+      end
+    end
+
+    class Context < BasicObject
       def initialize(source:)
         @builder = Builder.new
         @umgr_defined = false
         @inside_umgr = false
-        @source_lines = source.lines
+        @assignment_parser = UmgrAssignmentParser.new(source.lines)
       end
 
       def umgr(&)
@@ -96,7 +150,7 @@ module Umgr
       attr_reader :builder
 
       def apply_umgr_assignments(&block)
-        assignment_names = umgr_assignment_names_for(block)
+        assignment_names = @assignment_parser.assignment_names_for(block)
         instance_eval(&block)
         validate_umgr_assignments!(assignment_names)
         return unless block.binding.local_variable_defined?(:version)
@@ -112,40 +166,6 @@ module Umgr
           ::Umgr::Errors::ValidationError,
           "Unsupported `umgr` assignment(s): #{invalid.join(', ')}"
         )
-      end
-
-      def umgr_assignment_names_for(block)
-        start_index = block.source_location.fetch(1) - 1
-        body_lines = extract_umgr_block_lines(start_index)
-        body_lines.filter_map do |line|
-          match = line.match(ASSIGNMENT_LINE_PATTERN)
-          match && match[1].to_sym
-        end.uniq
-      end
-
-      def extract_umgr_block_lines(start_index)
-        line = @source_lines.fetch(start_index, '')
-        if line.include?('{')
-          return [line[/\{(.*)\}/, 1]].compact
-        end
-
-        lines = []
-        depth = 1
-        index = start_index + 1
-
-        while depth.positive? && index < @source_lines.length
-          current = @source_lines[index]
-          stripped = current.strip
-
-          depth -= 1 if stripped == 'end'
-          break if depth.zero?
-
-          lines << current
-          depth += 1 if stripped.end_with?(' do')
-          index += 1
-        end
-
-        lines
       end
 
       def emit_matrix_resources(provider, type, accounts, shared_options)
