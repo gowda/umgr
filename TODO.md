@@ -114,11 +114,11 @@
     - [x] Library verification (RSpec)
     - [x] Pre-commit checks passed (rubocop + rspec + aruba)
     - [x] Commit created
-  - [ ] Task 6.3: Implement plan outputs (human default + --json)
-    - [ ] CLI verification (Aruba)
-    - [ ] Library verification (RSpec)
-    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [ ] Commit created
+  - [x] Task 6.3: Implement plan outputs (human default + --json)
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
   - [ ] Task 6.4: Implement explicit drift detection reporting in plan output and API results
     - [ ] CLI verification (Aruba)
     - [ ] Library verification (RSpec)

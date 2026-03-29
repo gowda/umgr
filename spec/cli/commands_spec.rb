@@ -114,22 +114,42 @@ RSpec.describe 'umgr commands', :cli do
     run_command("#{executable} plan --config users.yml")
 
     expect(last_command_started).to have_exit_status(0)
-    parsed = JSON.parse(last_command_started.stdout)
-    changes = parsed.fetch('changeset').fetch('changes')
+    lines = last_command_started.stdout.lines.map(&:strip).reject(&:empty?)
 
-    expect(parsed['ok']).to eq(true)
-    expect(parsed['status']).to eq('planned')
-    expect(changes.map { |change| [change['identity'], change['action']] }).to eq(
+    expect(lines.first).to eq('Plan summary: create=1 update=1 delete=1 no_change=0')
+    expect(lines[1..]).to eq(
       [
-        ['echo.user.alice', 'update'],
-        ['echo.user.bob', 'delete'],
-        ['echo.user.carla', 'create']
+        'UPDATE echo.user.alice',
+        'DELETE echo.user.bob',
+        'CREATE echo.user.carla'
       ]
     )
+  end
+
+  it 'renders plan output as json when --json is provided' do
+    write_file(
+      'users.yml',
+      <<~YAML
+        version: 1
+        resources:
+          - provider: echo
+            type: user
+            name: alice
+      YAML
+    )
+
+    run_command("#{executable} plan --config users.yml --json")
+
+    expect(last_command_started).to have_exit_status(0)
+    parsed = JSON.parse(last_command_started.stdout)
+
+    expect(parsed['ok']).to eq(true)
+    expect(parsed['action']).to eq('plan')
+    expect(parsed['status']).to eq('planned')
     expect(parsed.fetch('changeset').fetch('summary')).to eq(
       'create' => 1,
-      'update' => 1,
-      'delete' => 1,
+      'update' => 0,
+      'delete' => 0,
       'no_change' => 0
     )
   end
