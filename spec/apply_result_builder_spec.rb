@@ -110,6 +110,26 @@ RSpec.describe Umgr::ApplyResultBuilder do
     end.to raise_error(Umgr::Errors::InternalError, /Apply is not idempotent/)
   end
 
+  it 'preserves original error when rollback itself fails' do
+    write_count = 0
+    allow(state_backend).to receive(:read).and_return(persisted_state)
+    allow(state_backend).to receive(:write) do
+      write_count += 1
+      raise Errno::ENOSPC, 'disk full during rollback' if write_count == 2
+    end
+    expect(state_backend).not_to receive(:delete)
+    allow(described_class).to receive(:warn)
+
+    expect do
+      described_class.call(
+        state_backend: state_backend,
+        options: { config: '/tmp/users.yml', desired_state: desired_state },
+        provider_registry: provider_registry
+      )
+    end.to raise_error(Umgr::Errors::InternalError, /Apply is not idempotent/)
+    expect(described_class).to have_received(:warn).with(/Rollback failed after apply error/)
+  end
+
   it 'raises internal error when change does not include provider information' do
     change = { identity: 'missing.provider', action: 'update', desired: nil, current: nil }
 

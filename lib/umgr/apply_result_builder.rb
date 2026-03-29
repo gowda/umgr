@@ -9,9 +9,9 @@ module Umgr
       previous_state = state_backend.read
       state_written = false
       write_state_and_build_result(state_backend, options, provider_registry) { state_written = true }
-    rescue StandardError
-      rollback_state(state_backend, previous_state) if state_written
-      raise
+    rescue StandardError => e
+      attempt_rollback(state_backend, previous_state) if state_written
+      raise e
     end
 
     def apply_changes(changes, provider_registry)
@@ -86,6 +86,15 @@ module Umgr
       else
         state_backend.delete
       end
+    end
+
+    def attempt_rollback(state_backend, previous_state)
+      rollback_state(state_backend, previous_state)
+    rescue StandardError => e
+      warn(
+        "Rollback failed after apply error (#{e.class}: #{e.message}); " \
+        'original apply error preserved'
+      )
     end
 
     def applied_change_result(change, provider_name, provider_result)
