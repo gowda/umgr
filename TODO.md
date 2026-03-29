@@ -99,17 +99,18 @@
 
 - [x] Phase 10: Release + Distribution
   <details>
-  <summary>Tasks (5)</summary>
+  <summary>Tasks (6)</summary>
 
   - [x] Prerequisite: Task 9.4 static website is completed before publishing work
   - [x] Task 10.1: Add private publish workflow for GitHub Packages triggered by GitHub Release publish event
   - [x] Task 10.2: Enforce progressive SemVer validation in release workflow before publish
   - [x] Task 10.3: Document private installation and Gemfile usage for GitHub Packages in README.md
   - [x] Task 10.4: Add public RubyGems publish readiness plan using OIDC trusted publishing (no long-lived API key secrets)
+  - [x] Task 10.5: Finalize public RubyGems docs after go-live (remove readiness placeholders and rename release guide)
 
   </details>
 
-- [ ] Phase 11: Post-Release DSL Config Generator
+- [x] Phase 11: Post-Release DSL Config Generator
   - [x] Task 11.1: Add Ruby DSL compiler that generates authoritative YAML/JSON config output (DSL is not runtime source)
     - [x] Define deterministic compile command (`umgr compile`) and output path policy
     - [x] Define DSL/config precedence policy for runtime commands (`validate/plan/apply/import`)
