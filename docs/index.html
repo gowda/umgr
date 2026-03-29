@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="umgr streamlines account lifecycle management across platform APIs with import, drift detection, plan, and apply workflows.">
+    <title>umgr</title>
+    <link rel="stylesheet" href="assets/site.css">
+  </head>
+  <body>
+    <div class="page">
+      <header class="hero">
+        <p class="kicker">umgr</p>
+        <h1>Streamline account lifecycle across platform APIs.</h1>
+        <p class="lead">
+          Import current users, detect drift from desired state, and reconcile safely
+          with plan/apply workflows.
+        </p>
+      </header>
+
+      <main>
+        <section aria-labelledby="what-it-does">
+          <h2 id="what-it-does">What it does</h2>
+          <ul>
+            <li>Uses YAML or JSON desired-state config files.</li>
+            <li>Tracks current state in local state storage.</li>
+            <li>Imports live users from providers/plugins.</li>
+            <li>Builds actionable drift-aware plans.</li>
+            <li>Applies changes and persists updated state.</li>
+          </ul>
+        </section>
+
+        <section aria-labelledby="interfaces">
+          <h2 id="interfaces">Interfaces</h2>
+          <ul>
+            <li>CLI for operators.</li>
+            <li>Ruby gem API for embedding in larger systems.</li>
+          </ul>
+        </section>
+
+        <section aria-labelledby="cli-quickstart">
+          <h2 id="cli-quickstart">CLI quickstart</h2>
+          <pre><code>umgr init
+umgr validate --config users.yml
+umgr plan --config users.yml
+umgr apply --config users.yml
+umgr import --config users.yml
+umgr show</code></pre>
+        </section>
+
+        <section aria-labelledby="library-quickstart">
+          <h2 id="library-quickstart">Gemfile and Ruby API</h2>
+          <pre><code># Gemfile
+gem "umgr"</code></pre>
+          <pre><code>require "umgr"
+
+runner = Umgr::Runner.new
+plan = runner.dispatch(:plan, config: "users.yml")
+apply = runner.dispatch(:apply, config: "users.yml")
+
+puts plan[:status]
+puts apply[:status]</code></pre>
+        </section>
+
+        <section aria-labelledby="provider-model">
+          <h2 id="provider-model">Provider model</h2>
+          <p>
+            Providers implement platform-specific behavior while keeping a common
+            runtime contract (`validate`, `current`, `plan`, `apply`).
+          </p>
+          <p>
+            Start with the provider authoring guide:
+            <a href="provider-authoring.md">Provider Authoring Guide</a>.
+          </p>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>
