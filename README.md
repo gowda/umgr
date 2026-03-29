@@ -53,9 +53,11 @@ Provider authoring guide:
 ## CLI Example
 
 ```bash
+umgr init
 umgr validate --config examples/users.yml
 umgr plan --config examples/users.yml
 umgr apply --config examples/users.yml
+umgr show
 ```
 
 ## Ruby API Example
@@ -64,8 +66,8 @@ umgr apply --config examples/users.yml
 require "umgr"
 
 runner = Umgr::Runner.new
-result = runner.plan(config_path: "examples/users.yml", format: :json)
+result = runner.dispatch(:plan, config: "examples/users.yml")
 
 puts result[:ok]
-puts result[:changes]
+puts result.dig(:changeset, :summary)
 ```
