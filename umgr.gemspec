@@ -17,6 +17,7 @@ Gem::Specification.new do |spec|
 
   spec.files = Dir.glob(%w[
                           Gemfile
+                          Rakefile
                           README.md
                           exe/umgr
                           lib/**/*.rb
