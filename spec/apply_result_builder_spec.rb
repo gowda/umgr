@@ -25,6 +25,7 @@ RSpec.describe Umgr::ApplyResultBuilder do
     stored_state = persisted_state
     allow(state_backend).to receive(:read) { stored_state }
     allow(state_backend).to receive(:write) { |new_state| stored_state = new_state }
+    allow(state_backend).to receive(:delete)
     allow(provider_registry).to receive(:fetch).with('echo').and_return(provider)
     allow(provider).to receive(:plan).and_return(ok: true, provider: 'echo', status: 'planned')
     allow(provider).to receive(:apply).and_return(ok: true, provider: 'echo', status: 'applied')
@@ -53,6 +54,7 @@ RSpec.describe Umgr::ApplyResultBuilder do
     allow(provider).to receive(:apply).and_return(ok: false, error: 'boom')
 
     expect(state_backend).not_to receive(:write)
+    expect(state_backend).not_to receive(:delete)
     expect do
       described_class.call(
         state_backend: state_backend,
@@ -78,9 +80,26 @@ RSpec.describe Umgr::ApplyResultBuilder do
     expect(result.fetch(:idempotency).fetch(:stable)).to eq(true)
   end
 
-  it 'raises internal error when post-apply plan still includes changes' do
+  it 'rolls back to previous state when post-apply plan still includes changes' do
+    writes = []
     allow(state_backend).to receive(:read).and_return(persisted_state)
+    allow(state_backend).to receive(:write) { |new_state| writes << new_state }
+    expect(state_backend).not_to receive(:delete)
+
+    expect do
+      described_class.call(
+        state_backend: state_backend,
+        options: { config: '/tmp/users.yml', desired_state: desired_state },
+        provider_registry: provider_registry
+      )
+    end.to raise_error(Umgr::Errors::InternalError, /Apply is not idempotent/)
+    expect(writes).to eq([{ version: 1, resources: desired_state[:resources] }, persisted_state])
+  end
+
+  it 'removes written state on rollback when no previous state existed' do
+    allow(state_backend).to receive(:read).and_return(nil)
     allow(state_backend).to receive(:write)
+    expect(state_backend).to receive(:delete).once
 
     expect do
       described_class.call(

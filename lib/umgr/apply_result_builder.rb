@@ -1,18 +1,17 @@
 # frozen_string_literal: true
 
 module Umgr
+  # rubocop:disable Metrics/ModuleLength
   module ApplyResultBuilder
     module_function
 
     def call(state_backend:, options:, provider_registry:)
-      desired_state = options.fetch(:desired_state)
-      plan_result = plan_result_for(state_backend, options, provider_registry)
-      apply_results = apply_changes(plan_result.fetch(:changeset).fetch(:changes), provider_registry)
-      final_state = build_final_state(desired_state)
-      state_backend.write(final_state)
-      idempotency = verify_idempotency(state_backend, options, provider_registry)
-      payload = result_payload(plan_result, apply_results, idempotency)
-      build_result(options: options, state_backend: state_backend, final_state: final_state, payload: payload)
+      previous_state = state_backend.read
+      state_written = false
+      write_state_and_build_result(state_backend, options, provider_registry) { state_written = true }
+    rescue StandardError
+      rollback_state(state_backend, previous_state) if state_written
+      raise
     end
 
     def apply_changes(changes, provider_registry)
@@ -65,8 +64,28 @@ module Umgr
       }
     end
 
+    def write_state_and_build_result(state_backend, options, provider_registry)
+      desired_state = options.fetch(:desired_state)
+      plan_result = plan_result_for(state_backend, options, provider_registry)
+      apply_results = apply_changes(plan_result.fetch(:changeset).fetch(:changes), provider_registry)
+      final_state = build_final_state(desired_state)
+      state_backend.write(final_state)
+      yield if block_given?
+      idempotency = verify_idempotency(state_backend, options, provider_registry)
+      payload = result_payload(plan_result, apply_results, idempotency)
+      build_result(options: options, state_backend: state_backend, final_state: final_state, payload: payload)
+    end
+
     def plan_result_for(state_backend, options, provider_registry)
       PlanResultBuilder.call(state_backend: state_backend, options: options, provider_registry: provider_registry)
+    end
+
+    def rollback_state(state_backend, previous_state)
+      if previous_state
+        state_backend.write(previous_state)
+      else
+        state_backend.delete
+      end
     end
 
     def applied_change_result(change, provider_name, provider_result)
@@ -117,4 +136,5 @@ module Umgr
       }
     end
   end
+  # rubocop:enable Metrics/ModuleLength
 end

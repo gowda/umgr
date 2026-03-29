@@ -35,6 +35,11 @@ module Umgr
       FileUtils.rm_f(temp_path)
     end
 
+    def delete
+      FileUtils.rm_f(path)
+      path
+    end
+
     private
 
     attr_reader :root_dir, :state_dir, :state_file
