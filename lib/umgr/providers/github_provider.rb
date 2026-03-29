@@ -43,12 +43,13 @@ module Umgr
       end
 
       def apply(changeset:)
-        {
-          ok: false,
-          provider: 'github',
-          status: 'not_implemented',
-          changeset: changeset
-        }
+        GithubApplyExecutor.call(
+          changeset: changeset,
+          api_client: api_client,
+          token_resolver: method(:resolve_token!),
+          present_string: method(:present_string?),
+          plan_resolver: method(:plan_for_apply)
+        )
       end
 
       private
@@ -109,6 +110,10 @@ module Umgr
         return login if present_string?(login)
 
         raise Errors::ApiError, 'GitHub API response missing user login'
+      end
+
+      def plan_for_apply(desired, current)
+        plan(desired: desired, current: current)
       end
     end
   end

@@ -8,7 +8,6 @@ RSpec.describe 'umgr commands', :cli do
 
   command_invocations = {
     'validate' => '--config users.yml',
-    'apply' => '--config users.yml',
     'import' => '--config users.yml'
   }
 
@@ -125,6 +124,45 @@ RSpec.describe 'umgr commands', :cli do
         'CREATE echo.user.carla'
       ]
     )
+  end
+
+  it 'applies desired state and returns applied result as json' do
+    write_file(
+      'users.yml',
+      <<~YAML
+        version: 1
+        resources:
+          - provider: echo
+            type: user
+            name: alice
+            attributes:
+              team: platform
+      YAML
+    )
+    write_file(
+      '.umgr/state.json',
+      JSON.generate(
+        version: 1,
+        resources: [{ provider: 'echo', type: 'user', name: 'alice', attributes: { team: 'infra' } }]
+      )
+    )
+
+    run_command("#{executable} apply --config users.yml")
+
+    expect(last_command_started).to have_exit_status(0)
+    parsed = JSON.parse(last_command_started.stdout)
+
+    expect(parsed['ok']).to eq(true)
+    expect(parsed['action']).to eq('apply')
+    expect(parsed['status']).to eq('applied')
+    expect(parsed.fetch('changeset').fetch('summary')).to eq(
+      'create' => 0,
+      'update' => 1,
+      'delete' => 0,
+      'no_change' => 0
+    )
+    expect(parsed.fetch('state').fetch('resources').first.fetch('attributes')).to eq('team' => 'platform')
+    expect(parsed.fetch('apply_results').first.fetch('status')).to eq('applied')
   end
 
   it 'renders plan output as json when --json is provided' do

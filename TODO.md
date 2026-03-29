@@ -147,13 +147,13 @@
     - [x] Library verification (RSpec)
     - [x] Pre-commit checks passed (rubocop + rspec + aruba)
     - [x] Commit created
-  - [ ] Task 7.4: Implement GitHub apply execution for membership reconciliation
-    - [ ] Apply org invitations and team membership updates safely
-    - [ ] Persist resulting state and preserve idempotency guarantees
-    - [ ] CLI verification (Aruba)
-    - [ ] Library verification (RSpec)
-    - [ ] Pre-commit checks passed (rubocop + rspec + aruba)
-    - [ ] Commit created
+  - [x] Task 7.4: Implement GitHub apply execution for membership reconciliation
+    - [x] Apply org invitations and team membership updates safely
+    - [x] Persist resulting state and preserve idempotency guarantees
+    - [x] CLI verification (Aruba)
+    - [x] Library verification (RSpec)
+    - [x] Pre-commit checks passed (rubocop + rspec + aruba)
+    - [x] Commit created
 
 - [ ] Phase 8: Apply Engine
   - [ ] Task 8.1: Implement apply execution and state persistence
