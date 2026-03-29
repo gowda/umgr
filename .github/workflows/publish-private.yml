@@ -45,5 +45,5 @@ jobs:
         env:
           OWNER: ${{ github.repository_owner }}
         run: |
-          gem_file="$(ls pkg/*.gem | head -n 1)"
+          gem_file="$(find pkg -maxdepth 1 -name '*.gem' -type f -print -quit)"
           gem push --key github --host "https://rubygems.pkg.github.com/${OWNER}" "$gem_file"
