@@ -68,6 +68,11 @@ RSpec.describe Umgr::Runner do
         ]
       )
       expect(result.fetch(:changeset).fetch(:summary)).to eq(create: 1, update: 1, delete: 1, no_change: 0)
+      expect(result.fetch(:drift)).to eq(
+        detected: true,
+        change_count: 3,
+        actions: { create: 1, update: 1, delete: 1 }
+      )
     end
   end
 

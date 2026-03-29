@@ -23,6 +23,11 @@ RSpec.describe Umgr::PlanResultBuilder do
     expect(result[:status]).to eq('planned')
     expect(result[:current_state][:resources].size).to eq(1)
     expect(result[:changeset][:summary]).to eq(create: 0, update: 0, delete: 0, no_change: 1)
+    expect(result[:drift]).to eq(
+      detected: false,
+      change_count: 0,
+      actions: { create: 0, update: 0, delete: 0 }
+    )
   end
 
   it 'falls back to shared initial state when no persisted state exists' do
@@ -33,5 +38,10 @@ RSpec.describe Umgr::PlanResultBuilder do
     expect(result[:status]).to eq('planned')
     expect(result[:current_state]).to eq(Umgr::StateTemplate::INITIAL_STATE)
     expect(result[:changeset][:summary]).to eq(create: 1, update: 0, delete: 0, no_change: 0)
+    expect(result[:drift]).to eq(
+      detected: true,
+      change_count: 1,
+      actions: { create: 1, update: 0, delete: 0 }
+    )
   end
 end

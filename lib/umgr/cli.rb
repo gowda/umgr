@@ -69,6 +69,7 @@ module Umgr
     def render_plan_result(result, options)
       return puts(JSON.generate(result)) if options[:json]
 
+      puts drift_status_line(result.fetch(:drift))
       summary = result.fetch(:changeset).fetch(:summary)
       puts plan_summary_line(summary)
       render_plan_changes(result.fetch(:changeset).fetch(:changes))
@@ -94,6 +95,11 @@ module Umgr
       changes.each do |change|
         puts "#{change.fetch(:action).upcase} #{change.fetch(:identity)}"
       end
+    end
+
+    def drift_status_line(drift)
+      detected = drift.fetch(:detected) ? 'yes' : 'no'
+      "Drift detected: #{detected} (changes=#{drift.fetch(:change_count)})"
     end
 
     def render_error(error)

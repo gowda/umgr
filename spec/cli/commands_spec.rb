@@ -116,8 +116,9 @@ RSpec.describe 'umgr commands', :cli do
     expect(last_command_started).to have_exit_status(0)
     lines = last_command_started.stdout.lines.map(&:strip).reject(&:empty?)
 
-    expect(lines.first).to eq('Plan summary: create=1 update=1 delete=1 no_change=0')
-    expect(lines[1..]).to eq(
+    expect(lines.first).to eq('Drift detected: yes (changes=3)')
+    expect(lines[1]).to eq('Plan summary: create=1 update=1 delete=1 no_change=0')
+    expect(lines[2..]).to eq(
       [
         'UPDATE echo.user.alice',
         'DELETE echo.user.bob',
@@ -146,6 +147,15 @@ RSpec.describe 'umgr commands', :cli do
     expect(parsed['ok']).to eq(true)
     expect(parsed['action']).to eq('plan')
     expect(parsed['status']).to eq('planned')
+    expect(parsed.fetch('drift')).to eq(
+      'detected' => true,
+      'change_count' => 1,
+      'actions' => {
+        'create' => 1,
+        'update' => 0,
+        'delete' => 0
+      }
+    )
     expect(parsed.fetch('changeset').fetch('summary')).to eq(
       'create' => 1,
       'update' => 0,
