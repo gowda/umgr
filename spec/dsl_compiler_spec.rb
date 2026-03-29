@@ -10,9 +10,10 @@ RSpec.describe Umgr::DslCompiler do
         dsl_path,
         <<~RUBY
           umgr do
-            version 1
-            resource provider: 'echo', type: 'user', name: 'alice', attributes: { team: 'platform' }
+            version = 1
           end
+
+          resource provider: 'echo', type: 'user', name: 'alice', attributes: { team: 'platform' }
         RUBY
       )
 
@@ -47,19 +48,19 @@ RSpec.describe Umgr::DslCompiler do
         dsl_path,
         <<~RUBY
           umgr do
-            version 1
+            version = 1
+          end
 
-            for_each(%w[alice bob]) do |name|
-              resource provider: 'echo', type: 'user', name: name
-            end
+          for_each(%w[alice bob]) do |name|
+            resource provider: 'echo', type: 'user', name: name
+          end
 
-            if_enabled(true) do
-              resource provider: 'echo', type: 'user', name: 'carol'
-            end
+          if_enabled(true) do
+            resource provider: 'echo', type: 'user', name: 'carol'
+          end
 
-            if_enabled(false) do
-              resource provider: 'echo', type: 'user', name: 'skip-me'
-            end
+          if_enabled(false) do
+            resource provider: 'echo', type: 'user', name: 'skip-me'
           end
         RUBY
       )
@@ -79,18 +80,18 @@ RSpec.describe Umgr::DslCompiler do
         dsl_path,
         <<~RUBY
           umgr do
-            version 1
-
-            provider_matrix(
-              providers: %w[slack github],
-              accounts: [
-                { name: 'zoe', attributes: { team: 'eng' } },
-                { name: 'amy', attributes: { team: 'sales' } }
-              ],
-              type: :user,
-              roles: ['member']
-            )
+            version = 1
           end
+
+          provider_matrix(
+            providers: %w[slack github],
+            accounts: [
+              { name: 'zoe', attributes: { team: 'eng' } },
+              { name: 'amy', attributes: { team: 'sales' } }
+            ],
+            type: :user,
+            roles: ['member']
+          )
         RUBY
       )
 
@@ -123,13 +124,13 @@ RSpec.describe Umgr::DslCompiler do
         dsl_path,
         <<~RUBY
           umgr do
-            version 1
-
-            provider_matrix(
-              providers: %w[github],
-              accounts: [{ attributes: { team: 'eng' } }]
-            )
+            version = 1
           end
+
+          provider_matrix(
+            providers: %w[github],
+            accounts: [{ attributes: { team: 'eng' } }]
+          )
         RUBY
       )
 
@@ -146,13 +147,13 @@ RSpec.describe Umgr::DslCompiler do
         dsl_path,
         <<~RUBY
           umgr do
-            version 1
-
-            provider_matrix(
-              providers: %w[github],
-              accounts: [{ name: '', attributes: { team: 'eng' } }]
-            )
+            version = 1
           end
+
+          provider_matrix(
+            providers: %w[github],
+            accounts: [{ name: '', attributes: { team: 'eng' } }]
+          )
         RUBY
       )
 
@@ -169,7 +170,7 @@ RSpec.describe Umgr::DslCompiler do
         dsl_path,
         <<~RUBY
           umgr do
-            version 1
+            version = 1
             system('echo should-not-run')
           end
         RUBY
@@ -178,6 +179,73 @@ RSpec.describe Umgr::DslCompiler do
       expect do
         described_class.compile_file(dsl_path)
       end.to raise_error(Umgr::Errors::ValidationError, /Unsupported DSL method `system`/)
+    end
+  end
+
+  it 'raises validation error when top-level umgr block is missing' do
+    Dir.mktmpdir do |tmp_dir|
+      dsl_path = File.join(tmp_dir, 'umgr.rb')
+      File.write(dsl_path, "resource provider: 'echo', type: 'user', name: 'alice'\n")
+
+      expect do
+        described_class.compile_file(dsl_path)
+      end.to raise_error(Umgr::Errors::ValidationError, /Top-level `umgr` block is required/)
+    end
+  end
+
+  it 'raises validation error when resource is nested inside umgr block' do
+    Dir.mktmpdir do |tmp_dir|
+      dsl_path = File.join(tmp_dir, 'umgr.rb')
+      File.write(
+        dsl_path,
+        <<~RUBY
+          umgr do
+            version = 1
+            resource provider: 'echo', type: 'user', name: 'alice'
+          end
+        RUBY
+      )
+
+      expect do
+        described_class.compile_file(dsl_path)
+      end.to raise_error(Umgr::Errors::ValidationError, /`resource` must be declared at top-level/)
+    end
+  end
+
+  it 'raises validation error when version is invoked as a method' do
+    Dir.mktmpdir do |tmp_dir|
+      dsl_path = File.join(tmp_dir, 'umgr.rb')
+      File.write(
+        dsl_path,
+        <<~RUBY
+          umgr do
+            version 1
+          end
+        RUBY
+      )
+
+      expect do
+        described_class.compile_file(dsl_path)
+      end.to raise_error(Umgr::Errors::ValidationError, /Unsupported DSL method `version`/)
+    end
+  end
+
+  it 'raises validation error for unsupported assignment inside umgr block' do
+    Dir.mktmpdir do |tmp_dir|
+      dsl_path = File.join(tmp_dir, 'umgr.rb')
+      File.write(
+        dsl_path,
+        <<~RUBY
+          umgr do
+            version = 1
+            foo = 'bar'
+          end
+        RUBY
+      )
+
+      expect do
+        described_class.compile_file(dsl_path)
+      end.to raise_error(Umgr::Errors::ValidationError, /Unsupported.*assignment/)
     end
   end
 end

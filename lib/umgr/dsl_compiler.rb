@@ -28,25 +28,92 @@ module Umgr
     attr_reader :path
 
     def compiled_config_from_source(source)
-      context = Context.new
+      context = Context.new(source:)
       result = context.instance_eval(source, path, 1)
       context.compiled_config || result
     end
 
+    class UmgrAssignmentParser
+      ASSIGNMENT_LINE_PATTERN = /^\s*([a-z_]\w*)\s*=/
+
+      def initialize(source_lines)
+        @source_lines = source_lines
+      end
+
+      def assignment_names_for(block)
+        start_index = block.source_location.fetch(1) - 1
+        body_lines = extract_umgr_block_lines(start_index)
+        body_lines.filter_map do |line|
+          match = line.match(ASSIGNMENT_LINE_PATTERN)
+          match && match[1].to_sym
+        end.uniq
+      end
+
+      private
+
+      def extract_umgr_block_lines(start_index)
+        line = @source_lines.fetch(start_index, '')
+        inline_body = line[/\{(.*)\}/, 1]
+        return [inline_body] if line.include?('{') && inline_body
+
+        nested_block_lines(start_index + 1)
+      end
+
+      def nested_block_lines(start_index)
+        lines = []
+        depth = 1
+        index = start_index
+
+        loop do
+          break unless scanning_block?(depth, index)
+
+          depth, index = scan_block_line(lines, depth, index)
+        end
+
+        lines
+      end
+
+      def scanning_block?(depth, index)
+        depth.positive? && index < @source_lines.length
+      end
+
+      def scan_block_line(lines, depth, index)
+        current = @source_lines[index]
+        stripped = current.strip
+        depth -= 1 if stripped == 'end'
+        return [depth, index + 1] if depth.zero?
+
+        lines << current
+        depth += 1 if stripped.end_with?(' do')
+        [depth, index + 1]
+      end
+    end
+
     class Context < BasicObject
-      def initialize
+      def initialize(source:)
         @builder = Builder.new
+        @umgr_defined = false
+        @inside_umgr = false
+        @assignment_parser = UmgrAssignmentParser.new(source.lines)
       end
 
       def umgr(&)
-        instance_eval(&)
-      end
+        if @inside_umgr || @umgr_defined
+          ::Kernel.raise ::Umgr::Errors::ValidationError, 'Top-level `umgr` block can only be declared once'
+        end
 
-      def version(value)
-        builder.version(value)
+        @umgr_defined = true
+        @inside_umgr = true
+        apply_umgr_assignments(&)
+      ensure
+        @inside_umgr = false
       end
 
       def resource(provider:, type:, name:, **)
+        if @inside_umgr
+          ::Kernel.raise ::Umgr::Errors::ValidationError, '`resource` must be declared at top-level, outside `umgr`'
+        end
+
         builder.resource(provider: provider, type: type, name: name, **)
       end
 
@@ -73,7 +140,7 @@ module Umgr
       end
 
       def compiled_config
-        return unless builder.used?
+        ::Kernel.raise ::Umgr::Errors::ValidationError, 'Top-level `umgr` block is required' unless @umgr_defined
 
         builder.to_h
       end
@@ -81,6 +148,25 @@ module Umgr
       private
 
       attr_reader :builder
+
+      def apply_umgr_assignments(&block)
+        assignment_names = @assignment_parser.assignment_names_for(block)
+        instance_eval(&block)
+        validate_umgr_assignments!(assignment_names)
+        return unless block.binding.local_variable_defined?(:version)
+
+        builder.version(block.binding.local_variable_get(:version))
+      end
+
+      def validate_umgr_assignments!(assignment_names)
+        invalid = assignment_names - [:version]
+        return if invalid.empty?
+
+        ::Kernel.raise(
+          ::Umgr::Errors::ValidationError,
+          "Unsupported `umgr` assignment(s): #{invalid.join(', ')}"
+        )
+      end
 
       def emit_matrix_resources(provider, type, accounts, shared_options)
         accounts.each do |entry|
@@ -115,8 +201,8 @@ module Umgr
       def method_missing(name, *_args, &)
         ::Kernel.raise(
           ::Umgr::Errors::ValidationError,
-          "Unsupported DSL method `#{name}`. Allowed: umgr, version, resource, resources, " \
-          'if_enabled, for_each, provider_matrix.'
+          "Unsupported DSL method `#{name}`. Allowed methods: umgr, resource, resources, " \
+          'if_enabled, for_each, provider_matrix. Set config with assignment in `umgr` (for example, `version = 1`).'
         )
       end
 

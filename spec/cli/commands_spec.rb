@@ -89,9 +89,10 @@ RSpec.describe 'umgr commands', :cli do
       'umgr.rb',
       <<~RUBY
         umgr do
-          version 1
-          resource provider: 'echo', type: 'user', name: 'alice', attributes: { team: 'platform' }
+          version = 1
         end
+
+        resource provider: 'echo', type: 'user', name: 'alice', attributes: { team: 'platform' }
       RUBY
     )
 
@@ -404,7 +405,7 @@ RSpec.describe 'umgr commands', :cli do
   end
 
   it 'returns validation error for auto-discovery ambiguity between DSL and static config' do
-    write_file('umgr.rb', "umgr do\n  version 1\nend\n")
+    write_file('umgr.rb', "umgr do\n  version = 1\nend\n")
     write_file('umgr.yml', "version: 1\nresources: []\n")
 
     run_command("#{executable} validate")
