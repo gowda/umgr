@@ -29,6 +29,6 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'faraday-retry', '~> 2.3'
-  spec.add_dependency 'octokit', '~> 9.2'
+  spec.add_dependency 'octokit', '>= 9.2', '< 11.0'
   spec.add_dependency 'thor', '~> 1.3'
 end
