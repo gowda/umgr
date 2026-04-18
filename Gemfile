@@ -4,7 +4,7 @@ gemspec
 
 group :development, :test do
   gem 'aruba'
-  gem 'rake', '~> 13.3'
+  gem 'rake', '~> 13.4'
   gem 'rspec'
   gem 'rubocop', require: false
   gem 'rubocop-performance', require: false
